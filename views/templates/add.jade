@@ -1,0 +1,24 @@
+extends ../layouts/main
+
+block content
+	div(class="large-8 columns")
+		h2 Add Template
+
+		ul.breadcrumbs
+			li
+				a(href="/") Melone
+			li
+				a(href="/templates") Templates
+			li.current
+				a(href="/templates/add") Add
+
+		form(method="post")
+			| !{form}
+			button(type="submit", class="button")
+				i.foundicon-checkmark
+				span Create Template
+	div(class="large-4 columns")
+
+
+block footer
+	script(src="/js/ckeditor/ckeditor.js")

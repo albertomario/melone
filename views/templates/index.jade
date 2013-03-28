@@ -1,0 +1,30 @@
+extends ../layouts/main
+
+block content
+	div(class="large-12 columns")
+		h2 Templates
+
+		ul.breadcrumbs
+			li
+				a(href="/") Melone
+			li.current
+				a Templates
+
+		a.button(href="/templates/add")
+			i.foundicon-plus
+			span Add Template
+
+		table
+			thead
+				tr
+					th Slug
+					th Description
+					th Created
+					th Updated
+			tbody
+				each template in templates
+					tr
+						td= template.slug
+						td= template.description
+						td= template.created
+						td= template.updated

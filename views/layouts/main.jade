@@ -1,0 +1,89 @@
+doctype 5
+html
+	head
+		meta(charset="utf-8")
+		meta(name="viewport", content="width=device-width")
+
+		title Melone
+
+		link(rel="stylesheet", href="/css/normalize.css")
+		link(rel="stylesheet", href="/css/foundation.min.css")
+		link(rel="stylesheet", href="/css/main.min.css")
+		link(rel="stylesheet", href="/css/font.min.css")
+
+		block head
+	body
+		header
+			nav.top-bar
+				ul.title-area
+					li.name
+						h1
+							a(href="/") Melone
+					li(class="toggle-topbar menu-icon")
+						a(href="#")
+
+				section.top-bar-section
+					ul.left
+						li.divider
+						li
+							a(href="/templates") Templates
+						li.divider
+						li
+							a(href="#") Tags
+						li.divider
+						li.has-dropdown
+							a Reports
+							ul.dropdown
+								li
+									a(href="#") Mails
+								li
+									a(href="#") Links
+								li
+									a(href="#") Opens
+						li.divider
+						li
+							a(href="#") Docs
+						li.divider
+						li.has-dropdown
+							a Account
+							ul.dropdown
+								li
+									a(href="/keys") API Keys
+								li
+									label Preferences
+								li
+									a(href="#") Change Password
+								li
+									a(href="#") Item 2
+						li.divider
+					ul.right
+						li(class="divider hide-for-small")
+						
+
+		div(class="row full-width")
+			- if (flash.success || flash.error || flash.info) {
+				div(class="large-12 columns")
+					div#flash
+						- if (flash.success)
+							each message in flash.success
+								div(data-alert, class="alert-box success")= message
+									a(href="#", class="close") &times;
+						- if (flash.error)
+							each message in flash.error
+								div(data-alert, class="alert-box alert")= message
+									a(href="#", class="close") &times;
+						- if (flash.info)
+							each message in flash.info
+								div(data-alert, class="alert-box")= message
+									a(href="#", class="close") &times;
+				- }
+			block content
+
+		footer(class="row full-width")
+			div(class="large-12 columns")
+				&copy; 2013 VisualAppeal
+
+		script(src="/js/jquery-1.9.1.min.js")
+		script(src="/js/foundation.min.js")
+		script(src="/js/main.js")
+		block footer
