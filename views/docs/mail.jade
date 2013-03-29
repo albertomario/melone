@@ -1,0 +1,58 @@
+extends ../layouts/main
+
+block content
+	div(class="large-12 columns")
+		h2 Documentation
+
+		ul.breadcrumbs
+			li
+				a(href="/") Melone
+			li
+				a(href="/docs") Documentation
+			li.current
+				a Mail
+
+		div(class="row full-width")
+			div(class="large-4 columns")
+				- var active = 'mail';
+				include _sidebar
+			div(class="large-8 columns")
+				h3 Sending mails
+				p Sending mails with a custom template.
+				pre(class="prettyprint")
+					code(class="language-js")
+						|{
+						|  "key": "f8a6657dc19b61cbd142c57ebb381128",
+						|  "secret": "524f3bc30d23f70b300877885a48509c",
+						|  "to": [
+						|    {
+						|      "email": "receiver@gmail.com",
+						|      "name": "Tom Test",
+						|      "vars": {
+						|        "name": "Tom Test"
+						|      }
+						|    }
+						|  ],
+						|  "subject": "Test Email",
+						|  "content": {
+						|    "html": {
+						|      "text": "&lt;h1&gt;\#{heading} \#{name}&lt;/h1&gt;&lt;p&gt;This is a &lt;a href='\#{url}'&gt;test&lt;/a&gt; email&lt;/p&gt;",
+						|      "vars": {
+						|        "url": "http://www.example.com"
+						|      }
+						|    },
+						|    "plain": {
+						|      "text": "\#{heading} \#{name}\n\nThis is a test email:\n\#{url}",
+						|      "vars": {
+						|        "url": "www.example.com"
+						|      }
+						|    },
+						|    "vars": {
+						|       "heading": "Hello"
+						|    }
+						|  },
+						|  "tracking": {
+						|    "open": true,
+						|    "links": true
+						|  }
+						|}

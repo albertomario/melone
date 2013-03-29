@@ -1,0 +1,53 @@
+extends ../layouts/main
+
+block head
+	script(src="/js/google-code-prettify/run_prettify.js?skin=desert")
+
+block content
+	div(class="large-12 columns")
+		h2 Documentation
+
+		ul.breadcrumbs
+			li
+				a(href="/") Melone
+			li.current
+				a Documentation
+
+		div(class="row full-width")
+			div(class="large-4 columns")
+				- var active = null;
+				include _sidebar
+			div(class="large-8 columns")
+				h3 General information
+				h4 Example server config
+				pre(class="prettyprint")
+					code(class="language-js")
+						|{
+						|    "url": "http://localhost:8000/",
+						|    "app": {
+						|        "port": 8000,
+						|        "sessionSecret": "asjbkjbagajgbjabgljag",
+						|        "salt": "quoghbqu189gh1igngbnc9223923"
+						|    },
+						|    "api": {
+						|        "port:": 8080,
+						|        "mailer": {
+						|            "service": "Gmail",
+						|            "auth": {
+						|                "user": "tomtest@gmail.com",
+						|                "pass": "12345678"
+						|            }
+						|        },
+						|        "mailOptions": {
+						|            "from": "Tom Test<tomtest@gmail.com>"
+						|        },
+						|        "type": "SMTP"
+						|    },
+						|    "db": {
+						|        "host": "localhost",
+						|        "username": "u_melone",
+						|        "password": "12345678",
+						|        "database": "melone",
+						|        "prefix": "mel_"
+						|    }
+						|}

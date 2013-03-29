@@ -11,7 +11,7 @@ block content
 				a Templates
 
 		a.button(href="/templates/add")
-			i.foundicon-plus
+			i.foundicon-add-doc
 			span Add Template
 
 		table
@@ -21,6 +21,7 @@ block content
 					th Description
 					th Created
 					th Updated
+					th
 			tbody
 				each template in templates
 					tr
@@ -28,3 +29,12 @@ block content
 						td= template.description
 						td= template.created
 						td= template.updated
+						td
+							a(href="/templates/" + template.id)
+								i.foundicon-search
+							span 
+							a(href="/templates/edit/" + template.id)
+								i.foundicon-edit
+							span 
+							a(href="/templates/remove/" + template.id, class="remove")
+								i.foundicon-remove

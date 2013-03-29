@@ -1,0 +1,31 @@
+extends ../layouts/main
+
+block content
+	div(class="large-8 columns")
+		h2= template.slug
+
+		ul.breadcrumbs
+			li
+				a(href="/") Melone
+			li
+				a(href="/templates") Templates
+			li.current
+				a(href="/templates/" + template.id)= template.slug
+
+		a.button(href="/templates/edit/" + template.id)
+			i.foundicon-edit
+			span Edit Template
+
+		h3 Description
+		div.panel
+			p= template.description
+
+		h3 HTML
+		div.panel!= template.html
+
+		h3 Plain
+		div.panel!= template.plain
+
+
+block footer
+	script(src="/js/ckeditor/ckeditor.js")

@@ -2,7 +2,10 @@ extends ../layouts/main
 
 block content
 	div(class="large-8 columns")
-		h2 Add Template
+		if update
+			h2 Update "#{template.slug}"
+		else
+			h2 Add Template
 
 		ul.breadcrumbs
 			li
@@ -15,8 +18,12 @@ block content
 		form(method="post")
 			| !{form}
 			button(type="submit", class="button")
-				i.foundicon-checkmark
-				span Create Template
+				if update
+					i.foundicon-checkmark
+					span Update Template
+				else
+					i.foundicon-checkmark
+					span Create Template
 	div(class="large-4 columns")
 
 

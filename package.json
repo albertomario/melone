@@ -24,8 +24,9 @@
     "winston": "~0.6.2",
     "jade": "~0.28.2",
     "mysql": "~2.0.0-alpha7",
-    "forms": "~0.1.4",
     "flashify": "~0.1.2",
-    "underscore": "~1.4.4"
+    "underscore": "~1.4.4",
+    "express-validator": "~0.3.2",
+    "validator": "~0.4.28"
   }
 }

@@ -33,6 +33,7 @@ function authenticate(req, res, next) {
 
 app.post('/api/status', authenticate, routes.status);
 app.post('/api/mail/send', authenticate, routes.mail.send);
+app.post('/api/template/send', authenticate, routes.mail.send);
 
 app.get('/api/o/:id.gif', routes.tracking.open);
 app.get('/api/l/:id', routes.tracking.click);

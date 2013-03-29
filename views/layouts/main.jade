@@ -42,7 +42,7 @@ html
 									a(href="#") Opens
 						li.divider
 						li
-							a(href="#") Docs
+							a(href="/docs") Docs
 						li.divider
 						li.has-dropdown
 							a Account
@@ -58,25 +58,25 @@ html
 						li.divider
 					ul.right
 						li(class="divider hide-for-small")
-						
+		
+		- if (flash.success || flash.error || flash.info) {
+			div(class="row full-width")
+				div(class="large-12 columns")
+					- if (flash.success)
+						each message in flash.success
+							div(data-alert, class="alert-box success")= message
+								a(href="#", class="close") &times;
+					- if (flash.error)
+						each message in flash.error
+							div(data-alert, class="alert-box alert")= message
+								a(href="#", class="close") &times;
+					- if (flash.info)
+						each message in flash.info
+							div(data-alert, class="alert-box")= message
+								a(href="#", class="close") &times;
+			- }
 
 		div(class="row full-width")
-			- if (flash.success || flash.error || flash.info) {
-				div(class="large-12 columns")
-					div#flash
-						- if (flash.success)
-							each message in flash.success
-								div(data-alert, class="alert-box success")= message
-									a(href="#", class="close") &times;
-						- if (flash.error)
-							each message in flash.error
-								div(data-alert, class="alert-box alert")= message
-									a(href="#", class="close") &times;
-						- if (flash.info)
-							each message in flash.info
-								div(data-alert, class="alert-box")= message
-									a(href="#", class="close") &times;
-				- }
 			block content
 
 		footer(class="row full-width")

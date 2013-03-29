@@ -2,32 +2,9 @@ var Key = require(__dirname + '/Key.js');
 var Template = require(__dirname + '/Template.js');
 var Data = require(__dirname + '/Data.js');
 
-var util = require('util');
-var forms = require('forms');
+var logger = require(__dirname + '/../lib/logger.js');
 
-var templateCreateForm = forms.create({
-	slug: forms.fields.string({
-		required: true,
-		errorAfterField: true
-	}),
-	description: forms.fields.string({
-		errorAfterField: true
-	}),
-	html: forms.fields.string({
-		widget: forms.widgets.textarea(),
-		cssClasses: [
-			'editor'
-		],
-		errorAfterField: true
-	}),
-	plain: forms.fields.string({
-		required: true,
-		widget: forms.widgets.textarea({
-			cols: 10
-		}),
-		errorAfterField: true
-	})
-});
+var util = require('util');
 
 var ServerError = function(message) {
 	this.code = 500;
@@ -47,17 +24,9 @@ NotFoundError.name = 'NotFoundError';
 
 var Routes = {
 	error: function(err, req, res, next) {
-		res.render(
-			'error.jade',
-			{
-				error: err.message
-			},
-			function(renderError, html) {
-				if (renderError) throw renderError;
-
-				res.send(err.code, html);
-			}
-		);
+		res.render('error.jade', {
+			error: err.message
+		});
 	},
 
 	index: function(req, res, next) {
@@ -102,34 +71,133 @@ var Routes = {
 			});
 		},
 
+		view: function(req, res, next) {
+			Template.find(req.params.id, function(err, theTemplate) {
+				if (err) {
+					next(new ServerError(err));
+				} else {
+					if (!theTemplate) {
+						req.flash('warning', 'Could not find the template!');
+						res.redirect('/templates');
+					} else {
+						res.render('templates/view.jade', {
+							template: theTemplate
+						});
+					}
+				}
+			});
+		},
+
 		add: function(req, res, next) {
-			res.render('templates/add.jade', {
-				form: templateCreateForm.toHTML()
+			var templateForm = forms.create(templateFormOptions);
+
+			res.render('templates/form.jade', {
+				update: false,
+				form: templateForm.toHTML()
 			});
 		},
 
 		create: function(req, res, next) {
-			templateCreateForm.handle(req, {
+			var templateForm = forms.create(templateFormOptions);
+
+			templateForm.handle(req, {
 				success: function(form) {
-					Template.create(function(err, id) {
+					Template.create(form.data, function(err, id) {
 						if (err) {
 							next(new ServerError(err));
 						} else {
+							req.flash('success', 'Template successfully created.');
 							res.redirect('/templates');
 						}
 					});
 				},
 				error: function(form) {
-					res.render('templates/add.jade', {
+					res.render('templates/form.jade', {
+						update: false,
 						form: form.toHTML()
 					});
 				},
 				empty: function(form) {
-					res.render('templates/add.jade', {
+					res.render('templates/form.jade', {
+						update: false,
 						form: form.toHTML()
 					});
 				}
 			});
+		},
+
+		edit: function(req, res, next) {
+			Template.find(req.params.id, function(err, theTemplate) {
+				if (err) {
+					next(new ServerError(err));
+				} else if (!theTemplate) {
+					next(new NotFoundError('Could not find the template!'));
+				} else {
+					res.render('templates/form.jade', {
+						update: true,
+						form: theTemplate.toHtml(),
+						template: theTemplate
+					});
+				}
+			});
+		},
+
+		update: function(req, res, next) {
+			console.log(req.body);
+			Template.find(req.params.id, function(err, theTemplate) {
+				if (err) {
+					next(new ServerError(err));
+				} else if (!theTemplate) {
+					next(new NotFoundError('Could not find the template!'));
+				} else {
+					theTemplate.set(req.body);
+
+					if (theTemplate.validate()) {
+						Template.update(theTemplate, function(err, theTemplate) {
+							if (err) {
+								next(new ServerError(err));
+							} else {
+								req.flash('success', 'Template successfully updated.');
+								res.redirect('/templates/' + theTemplate.id);
+							}
+						});
+					} else {
+						console.log('error', theTemplate.getErrors());
+						res.flash('error', theTemplate.firstError());
+
+						res.render('templates/form.jade', {
+							update: true,
+							form: theTemplate.toHtml(),
+							template: theTemplate
+						});
+					}
+				}
+			});
+		},
+
+		remove: function(req, res, next) {
+			Template.remove(req.params.id, function(err) {
+				if (err) {
+					next(new ServerError(err));
+				} else {
+					req.flash('info', 'Template successfully deleted.');
+					res.redirect('/templates');
+				}
+			});
+		}
+	},
+
+	docs: {
+		index: function(req, res, next) {
+			res.render('docs/index.jade');
+		},
+
+		mail: function(req, res, next) {
+			res.render('docs/mail.jade');
+		},
+
+		templates: function(req, res, next) {
+			res.render('docs/templates.jade');
 		}
 	},
 

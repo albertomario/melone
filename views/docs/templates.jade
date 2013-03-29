@@ -1,0 +1,57 @@
+extends ../layouts/main
+
+block content
+	div(class="large-12 columns")
+		h2 Documentation
+
+		ul.breadcrumbs
+			li
+				a(href="/") Melone
+			li
+				a(href="/docs") Documentation
+			li.current
+				a Templates
+
+		div(class="row full-width")
+			div(class="large-4 columns")
+				- var active = 'templates';
+				include _sidebar
+			div(class="large-8 columns")
+				h3 Sending templates
+				p Sending mails with a saved template.
+				pre(class="prettyprint")
+					code(class="language-js")
+						|{
+						|  "key": "f8a6657dc19b61cbd142c57ebb381128",
+						|  "secret": "524f3bc30d23f70b300877885a48509c",
+						|  "to": [
+						|    {
+						|      "email": "receiver@gmail.com",
+						|      "name": "Tom Test",
+						|      "vars": {
+						|        "name": "Tom Test"
+						|      }
+						|    }
+						|  ],
+						|  "subject": "Test Email",
+						|  "content": {
+						|    "template": "my-saved-welcome-template"
+						|    "html": {
+						|      "vars": {
+						|        "url": "http://www.example.com"
+						|      }
+						|    },
+						|    "plain": {
+						|      "vars": {
+						|        "url": "www.example.com"
+						|      }
+						|    },
+						|    "vars": {
+						|       "heading": "Hello"
+						|    }
+						|  },
+						|  "tracking": {
+						|    "open": true,
+						|    "links": true
+						|  }
+						|}
