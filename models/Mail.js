@@ -2,6 +2,8 @@ var config = require(__dirname + '/../lib/config.js');
 var logger = require(__dirname + '/../lib/logger.js');
 var db = require(__dirname + '/../lib/db.js');
 
+var Template = require(__dirname + '/Template.js');
+
 var jade = require('jade');
 var _ = require('underscore');
 var nodemailer = require('nodemailer');
@@ -165,6 +167,18 @@ var Mail = function(params) {
 		}
 	};
 
+	this.getTemplate = function(cb) {
+		logger.debug('Get template for mail...');
+
+		if (this._content && this._content.template) {
+			Template.findBySlug(this._content.template, function(err, theTemplate) {
+				return cb(err, theTemplate);
+			});
+		} else {
+			return cb(null, null);
+		}
+	};
+
 	this.send = function(cb) {
 		logger.verbose('Sending email...');
 		var _this = this;
@@ -213,85 +227,104 @@ var Mail = function(params) {
 							});
 
 							var errors = [];
+							var contentHtml = '';
+							var contentPlain = '';
 
-							_.each(recipients, function(recipient) {
-								if (_this._content && _this._content.html && _this._content.html.text) {
-									mailVars = _this._content.html.vars || {};
-									staticVars = _.extend(mailVars, globalVars);
-
-									userVars = recipient.vars;
-									templateVars = _.extend(staticVars, userVars);
-
-									compiler = jade.compile(_this._content.html.text);
-
-									try {
-										html = compiler(templateVars);
-									} catch (e) {
-										logger.warn('Error while rendering the html template!', e);
-										return cb('Error while rendering the html template: ' + e.message);
+							_this.getTemplate(function(err, theTemplate) {
+								if (err) {
+									return cb(err);
+								} else {
+									if (theTemplate) {
+										contentHtml = theTemplate.html;
+										contentPlain = theTemplate.plain;
 									}
-								}
-
-								if (_this._content && _this._content.plain && _this._content.plain.text) {
-									mailVars = _this._content.plain.vars || {};
-									staticVars = _.extend(mailVars, globalVars);
-
-									userVars = recipient.vars;
-									templateVars = _.extend(staticVars, userVars);
-
-									compiler = jade.compile(_this._content.plain.text.replace(/^/gm, '!'));
-
-									try {
-										plain = compiler(templateVars);
-										plain = plain.replace(/^!/gm, '');
-									} catch (e) {
-										logger.warn('Error while rendering the plain text template!', e);
-										return cb('Error while rendering the plain text template: ' + e.message);
+									else if (_this._content) {
+										if (_this._content.html && _this._content.html.text)
+											contentHtml = _this._content.html.text;
+										if (_this._content.plain && _this._content.plain.text)
+											contentPlain = _this._content.plain.text;
 									}
-								} else if (this._content && _this._content.html && this._content.html.convertToPlain) {
-									//Convert html to plain text
-								}
 
-								_this._addTrackingLinks(plain, html, recipient, function(err, thePlain, theHtml, theRecipient) {
-									if (err) {
-										return cb(err);
-									} else {
-										if (_this._tracking) {
-											if (_this._tracking.open) {
-												html = _this._addTrackingOpen(html, recipient);
+									_.each(recipients, function(recipient) {
+										if (contentHtml) {
+											mailVars = _this._content.html.vars || {};
+											staticVars = _.extend(mailVars, globalVars);
+
+											userVars = recipient.vars;
+											templateVars = _.extend(staticVars, userVars);
+
+											compiler = jade.compile(contentHtml);
+
+											try {
+												html = compiler(templateVars);
+											} catch (e) {
+												logger.warn('Error while rendering the html template!', e);
+												return cb('Error while rendering the html template: ' + e.message);
 											}
 										}
 
-										logger.debug('Sending mail to recepient ' + (sentCurrent + 1) + '/' + sentCount);
-										mailTransport.sendMail(_.extend(mailOptions, {
-												to: _this._convertRecipient(theRecipient),
-												text: thePlain,
-												html: theHtml
-											}),
-											function(err, response) {
-												if (err) {
-													logger.error('Error while sending mail to recepient ' + (sentCurrent + 1) + '/' + sentCount, err);
+										if (contentPlain) {
+											mailVars = _this._content.plain.vars || {};
+											staticVars = _.extend(mailVars, globalVars);
 
-													errors.push({
-														recipient: theRecipient,
-														error: err
-													});
-												} else {
-													logger.debug('Mail sent to recepient ' + (sentCurrent + 1) + '/' + sentCount);
-												}
+											userVars = recipient.vars;
+											templateVars = _.extend(staticVars, userVars);
 
-												sentCurrent++;
+											compiler = jade.compile(contentPlain.replace(/^/gm, '!'));
 
-												if (sentCurrent >= sentCount) {
-													if (!errors.length)
-														errors = null;
-
-													return cb(errors);
-												}
+											try {
+												plain = compiler(templateVars);
+												plain = plain.replace(/^!/gm, '');
+											} catch (e) {
+												logger.warn('Error while rendering the plain text template!', e);
+												return cb('Error while rendering the plain text template: ' + e.message);
 											}
-										);
-									}
-								});
+										} else if (this._content && _this._content.html && this._content.html.convertToPlain) {
+											//Convert html to plain text
+										}
+
+										_this._addTrackingLinks(plain, html, recipient, function(err, thePlain, theHtml, theRecipient) {
+											if (err) {
+												return cb(err);
+											} else {
+												if (_this._tracking) {
+													if (_this._tracking.open) {
+														html = _this._addTrackingOpen(html, recipient);
+													}
+												}
+
+												logger.debug('Sending mail to recepient ' + (sentCurrent + 1) + '/' + sentCount);
+												mailTransport.sendMail(_.extend(mailOptions, {
+														to: _this._convertRecipient(theRecipient),
+														text: thePlain,
+														html: theHtml
+													}),
+													function(err, response) {
+														if (err) {
+															logger.error('Error while sending mail to recepient ' + (sentCurrent + 1) + '/' + sentCount, err);
+
+															errors.push({
+																recipient: theRecipient,
+																error: err
+															});
+														} else {
+															logger.debug('Mail sent to recepient ' + (sentCurrent + 1) + '/' + sentCount);
+														}
+
+														sentCurrent++;
+
+														if (sentCurrent >= sentCount) {
+															if (!errors.length)
+																errors = null;
+
+															return cb(errors);
+														}
+													}
+												);
+											}
+										});
+									});
+								}
 							});
 						}
 					});

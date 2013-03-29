@@ -89,41 +89,36 @@ var Routes = {
 		},
 
 		add: function(req, res, next) {
-			var templateForm = forms.create(templateFormOptions);
+			var theTemplate = Template.factory();
 
 			res.render('templates/form.jade', {
 				update: false,
-				form: templateForm.toHTML()
+				form: theTemplate.toHtml()
 			});
 		},
 
 		create: function(req, res, next) {
-			var templateForm = forms.create(templateFormOptions);
+			var theTemplate = Template.factory();
 
-			templateForm.handle(req, {
-				success: function(form) {
-					Template.create(form.data, function(err, id) {
-						if (err) {
-							next(new ServerError(err));
-						} else {
-							req.flash('success', 'Template successfully created.');
-							res.redirect('/templates');
-						}
-					});
-				},
-				error: function(form) {
-					res.render('templates/form.jade', {
-						update: false,
-						form: form.toHTML()
-					});
-				},
-				empty: function(form) {
-					res.render('templates/form.jade', {
-						update: false,
-						form: form.toHTML()
-					});
-				}
-			});
+			theTemplate.set(req.body);
+			if (theTemplate.validate()) {
+				Template.create(theTemplate, function(err, theTemplate) {
+					if (err) {
+						next(new ServerError(err));
+					} else {
+						req.flash('success', 'Template successfully updated.');
+						res.redirect('/templates/' + theTemplate.id);
+					}
+				});
+			} else {
+				res.flash('error', theTemplate.firstError());
+
+				res.render('templates/form.jade', {
+					update: false,
+					form: theTemplate.toHtml(),
+					template: theTemplate
+				});
+			}
 		},
 
 		edit: function(req, res, next) {
@@ -143,7 +138,6 @@ var Routes = {
 		},
 
 		update: function(req, res, next) {
-			console.log(req.body);
 			Template.find(req.params.id, function(err, theTemplate) {
 				if (err) {
 					next(new ServerError(err));
@@ -162,7 +156,6 @@ var Routes = {
 							}
 						});
 					} else {
-						console.log('error', theTemplate.getErrors());
 						res.flash('error', theTemplate.firstError());
 
 						res.render('templates/form.jade', {

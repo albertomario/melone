@@ -1,19 +1,26 @@
+var Routes = require(__dirname + '/models/ApiRoutes.js');
+var Key = require(__dirname + '/models/Key.js');
+
 var config = require(__dirname + '/lib/config.js');
 var logger = require(__dirname + '/lib/logger.js');
-var routes = require(__dirname + '/models/ApiRoutes.js');
-
-var Key = require(__dirname + '/models/Key.js');
 
 var express = require('express');
 var app = express();
 
 app.configure(function() {
+	app.use(express.cookieParser(config.app.sessionSecret));
 	app.use(express.bodyParser());
-	app.use(routes.error);
+	app.use(express.session({
+		cookie: {
+			maxAge: 60000
+		}
+	}));
+	app.use(Routes.error);
 	app.use(app.router);
 });
 
 function authenticate(req, res, next) {
+	logger.warn('authenticate');
 	if (req.body && req.body.key && req.body.secret) {
 		Key.validate(req.body.key, req.body.secret, function(err) {
 			if (err) {
@@ -31,12 +38,11 @@ function authenticate(req, res, next) {
 	}
 }
 
-app.post('/api/status', authenticate, routes.status);
-app.post('/api/mail/send', authenticate, routes.mail.send);
-app.post('/api/template/send', authenticate, routes.mail.send);
+app.post('/api/status', authenticate, Routes.status);
+app.post('/api/mail/send', authenticate, Routes.mail.send);
 
-app.get('/api/o/:id.gif', routes.tracking.open);
-app.get('/api/l/:id', routes.tracking.click);
+app.get('/api/o/:id.gif', Routes.tracking.open);
+app.get('/api/l/:id', Routes.tracking.click);
 
 app.listen(config.api.port, function(err) {
 	if (err) {

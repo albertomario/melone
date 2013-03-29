@@ -94,7 +94,6 @@ function TemplateModel(attributes) {
 		this.description = sanitize(this.description).trim();
 		this.html = sanitize(this.html).trim();
 		this.html = sanitize(this.html).xss();
-		this.html = sanitize(this.html).nl2br();
 		this.plain = sanitize(this.plain).trim();
 		this.plain = sanitize(this.plain).xss();
 		this.plain = sanitize(this.plain).nl2br();
@@ -119,13 +118,13 @@ function TemplateModel(attributes) {
 	};
 
 	this.set({
-		id: attributes.id,
-		slug: attributes.slug,
-		description: attributes.description,
-		html: attributes.html,
-		plain: attributes.plain,
-		created: attributes.created,
-		updated: attributes.updated
+		id: attributes.id || null,
+		slug: attributes.slug || null,
+		description: attributes.description || null,
+		html: attributes.html || null,
+		plain: attributes.plain || null,
+		created: attributes.created || null,
+		updated: attributes.updated || '0000-00-00 00:00:00'
 	});
 }
 
@@ -160,7 +159,7 @@ var Template = {
 					logger.error('Error while getting template by ID!', err);
 					return cb('Error while getting template!', null);
 				} else if (!templates.length) {
-					logger.warn('Could not find template by ID # ' + id + '!');
+					logger.warn('Could not find template by ID #' + id + '!');
 					return cb(null, null);
 				} else {
 					logger.debug('Found template by ID #' + id + '.');
@@ -170,16 +169,45 @@ var Template = {
 		);
 	},
 
-	create: function(data, cb) {
+	findBySlug: function(slug, cb) {
+		logger.debug('Getting template by slug "' + slug + '"...');
+
+		db.query(
+			'SELECT * FROM {{template}} WHERE `slug` = :slug LIMIT 1',
+			{
+				slug: slug
+			},
+			function(err, templates) {
+				if (err) {
+					logger.error('Error while getting template by slug!', err);
+					return cb('Error while getting template!', null);
+				} else if (!templates.length) {
+					logger.warn('Could not find template by slug "' + slug + '"!');
+					return cb(null, null);
+				} else {
+					logger.debug('Found template by slug "' + slug + '".');
+					return cb(null, new TemplateModel(templates[0]));
+				}
+			}
+		);
+	},
+
+	factory: function() {
+		return new TemplateModel({});
+	},
+
+	create: function(theTemplate, cb) {
 		logger.debug('Adding template to database...');
+
+		var _this = this;
 
 		db.query(
 			'INSERT INTO {{template}}(`slug`, `description`, `html`, `plain`) VALUES(:slug, :description, :html, :plain)',
 			{
-				slug: data.slug,
-				description: data.description,
-				html: data.html,
-				plain: data.plain
+				slug: theTemplate.slug,
+				description: theTemplate.description,
+				html: theTemplate.html,
+				plain: theTemplate.plain
 			},
 			function(err, result) {
 				if (err) {
@@ -187,7 +215,10 @@ var Template = {
 					return cb('Error while creating template!', null);
 				} else {
 					logger.verbose('New template #' + result.insertId + ' created.');
-					return cb(null, result.insertId);
+
+					_this.find(result.insertId, function(err, theTemplate) {
+						return cb(err, theTemplate);
+					});
 				}
 			}
 		);
@@ -223,7 +254,22 @@ var Template = {
 	},
 
 	remove: function(id, cb) {
-		return cb(null);
+		logger.debug('Remove template #' + id);
+
+		db.query(
+			'DELETE FROM {{template}} WHERE `id` = :id',
+			{
+				id: id
+			},
+			function(err) {
+				if (err) {
+					logger.error('Error while deleting template!', err);
+					return cb('Error while deleting the template!');
+				} else {
+					return cb(null);
+				}
+			}
+		);
 	}
 };
 
