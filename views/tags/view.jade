@@ -1,0 +1,25 @@
+extends ../layouts/main
+
+block content
+	div(class="large-8 columns")
+		h2= tag.name
+
+		ul.breadcrumbs
+			li
+				a(href="/") Melone
+			li
+				a(href="/tags") Tags
+			li.current
+				a(href="/tags/" + tag.id)= tag.name
+
+		a.button(href="/tags/edit/" + tag.id)
+			i.foundicon-edit
+			span Edit Tag
+
+		h3 Description
+		div.panel
+			p= tag.description
+
+
+block footer
+	script(src="/js/ckeditor/ckeditor.js")

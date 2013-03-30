@@ -1,0 +1,38 @@
+extends ../layouts/main
+
+block content
+	div(class="large-12 columns")
+		h2 Tags
+
+		ul.breadcrumbs
+			li
+				a(href="/") Melone
+			li.current
+				a Tags
+
+		a.button(href="/tags/add")
+			i.foundicon-add-doc
+			span Add Tag
+
+		table
+			thead
+				tr
+					th Name
+					th Description
+					th Created
+					th
+			tbody
+				each tag in tags
+					tr
+						td= tag.name
+						td= tag.description
+						td= tag.created
+						td
+							a(href="/tags/" + tag.id)
+								i.foundicon-search
+							span 
+							a(href="/tags/edit/" + tag.id)
+								i.foundicon-edit
+							span 
+							a(href="/tags/remove/" + tag.id, class="remove")
+								i.foundicon-remove

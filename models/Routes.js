@@ -1,5 +1,6 @@
 var Key = require(__dirname + '/Key.js');
 var Template = require(__dirname + '/Template.js');
+var Tag = require(__dirname + '/Tag.js');
 var Data = require(__dirname + '/Data.js');
 
 var logger = require(__dirname + '/../lib/logger.js');
@@ -180,6 +181,127 @@ var Routes = {
 						} else {
 							req.flash('info', 'Template successfully deleted.');
 							res.redirect('/templates');
+						}
+					});
+				}
+			});
+		}
+	},
+
+	tags: {
+		index: function(req, res, next) {
+			Tag.findAll(function(err, tags) {
+				if (err) {
+					next(new ServerError(err));
+				} else {
+					res.render('tags/index.jade', {
+						tags: tags
+					});
+				}
+			});
+		},
+
+		view: function(req, res, next) {
+			Tag.find(req.params.id, function(err, theTag) {
+				if (err) {
+					next(new ServerError(err));
+				} else {
+					if (!theTag) {
+						req.flash('warning', 'Could not find the tag!');
+						res.redirect('/tags');
+					} else {
+						res.render('tags/view.jade', {
+							tag: theTag
+						});
+					}
+				}
+			});
+		},
+
+		add: function(req, res, next) {
+			var theTag = Tag.factory();
+
+			res.render('tags/form.jade', {
+				update: false,
+				form: theTag.toHtml()
+			});
+		},
+
+		create: function(req, res, next) {
+			var theTag = Tag.factory(req.body);
+
+			theTag.save(function(err) {
+				if (err) {
+					res.flash('error', err);
+
+					res.render('tags/form.jade', {
+						update: false,
+						form: theTag.toHtml(),
+						tag: theTag
+					});
+				} else {
+					req.flash('success', 'Tag successfully created.');
+					res.redirect('/tags/' + theTag.id);
+				}
+			});
+		},
+
+		edit: function(req, res, next) {
+			Tag.find(req.params.id, function(err, theTag) {
+				if (err) {
+					next(new ServerError(err));
+				} else if (!theTag) {
+					next(new NotFoundError('Could not find the tag!'));
+				} else {
+					res.render('tags/form.jade', {
+						update: true,
+						form: theTag.toHtml(),
+						tag: theTag
+					});
+				}
+			});
+		},
+
+		update: function(req, res, next) {
+			Tag.find(req.params.id, function(err, theTag) {
+				if (err) {
+					next(new ServerError(err));
+				} else if (!theTag) {
+					next(new NotFoundError('Could not find the tag!'));
+				} else {
+					theTag.set(req.body);
+
+					theTag.save(function(err) {
+						if (err) {
+							res.flash('error', err);
+
+							res.render('tags/form.jade', {
+								update: true,
+								form: theTag.toHtml(),
+								tag: theTag
+							});
+						} else {
+							req.flash('success', 'Tag successfully updated.');
+							res.redirect('/tags/' + theTag.id);
+						}
+					});
+				}
+			});
+		},
+
+		remove: function(req, res, next) {
+			Tag.find(req.params.id, function(err, theTag) {
+				if (err) {
+					next(new ServerError(err));
+				} else if (!theTag) {
+					next(new NotFoundError('Could not find the tag!'));
+				} else {
+					theTag.remove(function(err) {
+						if (err) {
+							next(new ServerError(err));
+						} else {
+							req.flash('info', 'Tag successfully deleted.');
+							res.redirect('/tags');
 						}
 					});
 				}
