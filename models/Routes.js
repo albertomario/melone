@@ -47,12 +47,20 @@ var Routes = {
 		},
 
 		add: function(req, res, next) {
-			Key.create(function(err, id) {
+			var theKey = Key.factory();
+
+			theKey.setUniqueKey(function(err) {
 				if (err) {
 					next(new ServerError(err));
 				} else {
-					req.flash('success', 'Api key successfully created.');
-					res.redirect('/keys');
+					theKey.save(function(err) {
+						if (err) {
+							next(new ServerError(err));
+						} else {
+							req.flash('success', 'Api key "' + theKey.key + '" successfully created.');
+							res.redirect('/keys');
+						}
+					});
 				}
 			});
 		}
@@ -98,27 +106,22 @@ var Routes = {
 		},
 
 		create: function(req, res, next) {
-			var theTemplate = Template.factory();
+			var theTemplate = Template.factory(req.body);
 
-			theTemplate.set(req.body);
-			if (theTemplate.validate()) {
-				Template.create(theTemplate, function(err, theTemplate) {
-					if (err) {
-						next(new ServerError(err));
-					} else {
-						req.flash('success', 'Template successfully updated.');
-						res.redirect('/templates/' + theTemplate.id);
-					}
-				});
-			} else {
-				res.flash('error', theTemplate.firstError());
+			theTemplate.save(function(err) {
+				if (err) {
+					res.flash('error', err);
 
-				res.render('templates/form.jade', {
-					update: false,
-					form: theTemplate.toHtml(),
-					template: theTemplate
-				});
-			}
+					res.render('templates/form.jade', {
+						update: false,
+						form: theTemplate.toHtml(),
+						template: theTemplate
+					});
+				} else {
+					req.flash('success', 'Template successfully created.');
+					res.redirect('/templates/' + theTemplate.id);
+				}
+			});
 		},
 
 		edit: function(req, res, next) {
@@ -146,24 +149,20 @@ var Routes = {
 				} else {
 					theTemplate.set(req.body);
 
-					if (theTemplate.validate()) {
-						Template.update(theTemplate, function(err, theTemplate) {
-							if (err) {
-								next(new ServerError(err));
-							} else {
-								req.flash('success', 'Template successfully updated.');
-								res.redirect('/templates/' + theTemplate.id);
-							}
-						});
-					} else {
-						res.flash('error', theTemplate.firstError());
+					theTemplate.save(function(err) {
+						if (err) {
+							res.flash('error', err);
 
-						res.render('templates/form.jade', {
-							update: true,
-							form: theTemplate.toHtml(),
-							template: theTemplate
-						});
-					}
+							res.render('templates/form.jade', {
+								update: true,
+								form: theTemplate.toHtml(),
+								template: theTemplate
+							});
+						} else {
+							req.flash('success', 'Template successfully updated.');
+							res.redirect('/templates/' + theTemplate.id);
+						}
+					});
 				}
 			});
 		},

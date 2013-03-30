@@ -4,7 +4,15 @@ var logger = require(__dirname + '/../lib/logger.js');
 var _ = require('underscore');
 var Validator = require('validator').Validator;
 
-function BaseModel(attributes) {
+function BaseModel(attributes, isNewRecord) {
+	if (!_.isUndefined(isNewRecord))
+		this._isNewRecord = isNewRecord;
+	else
+		this._isNewRecord = true;
+
+	console.log(isNewRecord);
+	console.log(this._isNewRecord);
+
 	this.errors = [];
 	this.v = new Validator();
 
@@ -55,7 +63,24 @@ function BaseModel(attributes) {
 	this.afterValidate = function(errors) {
 		this.errors = errors;
 
-		return (this.errors.length === 0);
+		return (this.errors.length === 0) ? null : this.getFirstError();
+	};
+
+	this.save = function(cb) {
+		if (this.validate) {
+			console.log('New Record: ' + this._isNewRecord);
+			if (this._isNewRecord) {
+				this.create(function(err) {
+					return cb(err);
+				});
+			} else {
+				this.update(function(err) {
+					return cb(err);
+				});
+			}
+		} else {
+			return cb(this.getFirstError());
+		}
 	};
 
 	this.remove = function(cb) {

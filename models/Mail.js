@@ -171,7 +171,7 @@ var Mail = function(params) {
 		logger.debug('Get template for mail...');
 
 		if (this._content && this._content.template) {
-			Template.findBySlug(this._content.template, function(err, theTemplate) {
+			Template.findByName(this._content.template, function(err, theTemplate) {
 				return cb(err, theTemplate);
 			});
 		} else {
