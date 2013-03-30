@@ -169,12 +169,20 @@ var Routes = {
 		},
 
 		remove: function(req, res, next) {
-			Template.remove(req.params.id, function(err) {
+			Template.find(req.params.id, function(err, theTemplate) {
 				if (err) {
 					next(new ServerError(err));
+				} else if (!theTemplate) {
+					next(new NotFoundError('Could not find the template!'));
 				} else {
-					req.flash('info', 'Template successfully deleted.');
-					res.redirect('/templates');
+					theTemplate.remove(function(err) {
+						if (err) {
+							next(new ServerError(err));
+						} else {
+							req.flash('info', 'Template successfully deleted.');
+							res.redirect('/templates');
+						}
+					});
 				}
 			});
 		}

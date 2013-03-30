@@ -1,3 +1,5 @@
+var BaseModel = require(__dirname + '/BaseModel.js');
+
 var db = require(__dirname + '/../lib/db.js');
 var logger = require(__dirname + '/../lib/logger.js');
 
@@ -21,8 +23,8 @@ Filter.prototype.nl2br = function() {
 };
 
 function TemplateModel(attributes) {
-	this.errors = [];
-	this.v = new Validator();
+	this._name = 'template';
+	this._table = '{{template}}';
 
 	this.attributes = [
 		{
@@ -47,46 +49,14 @@ function TemplateModel(attributes) {
 		}
 	];
 
-	this.toHtml = function() {
-		var html = '';
-
-		for (var i = 0; i < this.attributes.length; i++) {
-			html += '<div class="row">';
-			html += '<div class="large-12 columns">';
-			html += '<label for="' + this.attributes[i].name + '">' + this.attributes[i].title + '</label>';
-			switch (this.attributes[i].type) {
-				case 'input':
-					html += '<input type="text" name="' + this.attributes[i].name + '" id="' + this.attributes[i].name + '" value="' + this[this.attributes[i].name] + '">';
-					break;
-				case 'textarea':
-					html += '<textarea name="' + this.attributes[i].name + '" id="' + this.attributes[i].name + '">' + this[this.attributes[i].name] + '</textarea>';
-					break;
-			}
-			html += '</div>';
-			html += '</div>';
-		}
-
-		return html;
-	};
-
 	this.validate = function() {
-		this.v.check(this.slug).len(4, 100);
-		this.v.check(this.description).len(0, 255);
+		if (this.slug)
+			this.v.check(this.slug).len(4, 100);
 
-		this.errors = this.v.getErrors();
+		if (this.description)
+			this.v.check(this.description).len(0, 255);
 
-		return (this.errors.length === 0);
-	};
-
-	this.getErrors = function() {
-		return this.errors;
-	};
-
-	this.getFirstError = function() {
-		if (this.errors.length)
-			return this.errors[0];
-		else
-			return false;
+		return this.afterValidate(this.v.getErrors());
 	};
 
 	this.sanitize = function() {
@@ -97,24 +67,6 @@ function TemplateModel(attributes) {
 		this.plain = sanitize(this.plain).trim();
 		this.plain = sanitize(this.plain).xss();
 		this.plain = sanitize(this.plain).nl2br();
-	};
-
-	this.set = function(data) {
-		this.slug = data.slug;
-		this.description = data.description;
-		this.html = data.html;
-		this.plain = data.plain;
-
-		if (data.id)
-			this.id = data.id;
-
-		if (data.created)
-			this.created = data.created;
-
-		if (data.updated)
-			this.updated = data.updated;
-
-		this.sanitize();
 	};
 
 	this.set({
@@ -128,7 +80,13 @@ function TemplateModel(attributes) {
 	});
 }
 
+TemplateModel.prototype = new BaseModel();
+
 var Template = {
+	factory: function() {
+		return new TemplateModel({});
+	},
+
 	findAll: function(cb) {
 		logger.debug('Getting all templates from database...');
 
@@ -192,10 +150,6 @@ var Template = {
 		);
 	},
 
-	factory: function() {
-		return new TemplateModel({});
-	},
-
 	create: function(theTemplate, cb) {
 		logger.debug('Adding template to database...');
 
@@ -248,25 +202,6 @@ var Template = {
 
 					theTemplate.updated = updated;
 					return cb(null, theTemplate);
-				}
-			}
-		);
-	},
-
-	remove: function(id, cb) {
-		logger.debug('Remove template #' + id);
-
-		db.query(
-			'DELETE FROM {{template}} WHERE `id` = :id',
-			{
-				id: id
-			},
-			function(err) {
-				if (err) {
-					logger.error('Error while deleting template!', err);
-					return cb('Error while deleting the template!');
-				} else {
-					return cb(null);
 				}
 			}
 		);
