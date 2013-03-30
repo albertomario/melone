@@ -24,7 +24,7 @@ block content
 		div.panel!= template.html
 
 		h3 Plain
-		div.panel!= template.plain
+		div.panel!= template.plain.replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1<br />$2')
 
 
 block footer

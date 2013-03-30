@@ -8,9 +8,11 @@ var logger = require(__dirname + '/../lib/logger.js');
 
 var _ = require('underscore');
 
-function TemplateModel(attributes) {
+function TemplateModel(attributes, isNewRecord) {
 	this._name = 'template';
 	this._table = '{{template}}';
+
+	this.init(attributes, isNewRecord);
 
 	this.set({
 		id: attributes.id || null,
@@ -62,7 +64,6 @@ function TemplateModel(attributes) {
 		this.html = sanitize(this.html).xss();
 		this.plain = sanitize(this.plain).trim();
 		this.plain = sanitize(this.plain).xss();
-		this.plain = sanitize(this.plain).nl2br();
 	};
 
 	this.create = function(cb) {
@@ -99,7 +100,7 @@ function TemplateModel(attributes) {
 		var updated = new Date();
 
 		db.query(
-			'UPDATE {{template}} SET `name` = :name, `description` = :description, `html` = :html, `plain` = :plain, `created` = :created `updated` = :updated WHERE `id` = :id',
+			'UPDATE {{template}} SET `name` = :name, `description` = :description, `html` = :html, `plain` = :plain, `created` = :created, `updated` = :updated WHERE `id` = :id',
 			{
 				name: this.name,
 				description: this.description,

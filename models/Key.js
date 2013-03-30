@@ -9,9 +9,11 @@ var config = require(__dirname + '/../lib/config.js');
 
 var crypto = require('crypto');
 
-function KeyModel(attributes) {
+function KeyModel(attributes, isNewRecord) {
 	this._name = 'key';
 	this._table = '{{key}}';
+
+	this.init(attributes, isNewRecord);
 
 	this.set({
 		id: attributes.id || null,
