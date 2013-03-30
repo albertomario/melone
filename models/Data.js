@@ -47,6 +47,9 @@ var Data = {
 
 		var firstDate = new Date();
 		firstDate.setTime(firstDate.getTime() - (30 * 24 * 3600 * 1000));
+		firstDate.setHours(0);
+		firstDate.setMinutes(0);
+		firstDate.setSeconds(0);
 
 		db.query(
 			'SELECT COUNT(*) AS `count`, DATE(`sent`) AS `date` FROM {{mail}} WHERE DATE(`sent`) >= :first_date GROUP BY YEAR(`sent`), MONTH(`sent`), DAY(`sent`) ORDER BY `sent` ASC',
@@ -63,7 +66,7 @@ var Data = {
 					sentData = _this._toData(firstDate, sent);
 
 					db.query(
-						'SELECT COUNT(*) AS `count`, DATE(`opened`) AS `date` FROM {{mail_to}} WHERE DATE(`opened`) > :first_date GROUP BY YEAR(`opened`), MONTH(`opened`), DAY(`opened`) ORDER BY `opened` ASC',
+						'SELECT COUNT(*) AS `count`, DATE(`opened`) AS `date` FROM {{mail_to}} WHERE DATE(`opened`) >= :first_date GROUP BY YEAR(`opened`), MONTH(`opened`), DAY(`opened`) ORDER BY `opened` ASC',
 						{
 							first_date: firstDate
 						},
@@ -77,7 +80,7 @@ var Data = {
 								openedData = _this._toData(firstDate, opened);
 
 								db.query(
-									'SELECT COUNT(*) AS `count`, DATE(`clicked`) AS `date` FROM {{mail_link}} WHERE DATE(`clicked`) > :first_date GROUP BY YEAR(`clicked`), MONTH(`clicked`), DAY(`clicked`) ORDER BY `clicked` ASC',
+									'SELECT COUNT(*) AS `count`, DATE(`clicked`) AS `date` FROM {{mail_link}} WHERE DATE(`clicked`) >= :first_date GROUP BY YEAR(`clicked`), MONTH(`clicked`), DAY(`clicked`) ORDER BY `clicked` ASC',
 									{
 										first_date: firstDate
 									},
@@ -93,15 +96,27 @@ var Data = {
 											return cb(null, [
 												{
 													name: 'Sent',
-													data: sentData
+													data: sentData,
+													color: '#1F782B',
+													marker: {
+														symbol: 'circle'
+													}
 												},
 												{
 													name: 'Opened',
-													data: openedData
+													data: openedData,
+													color: '#1F2A78',
+													marker: {
+														symbol: 'diamond'
+													}
 												},
 												{
 													name: 'Clicked',
-													data: clickedData
+													data: clickedData,
+													color: '#781F1F',
+													marker: {
+														symbol: 'triangle'
+													}
 												}
 											]);
 										}
