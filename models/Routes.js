@@ -320,6 +320,10 @@ var Routes = {
 
 		templates: function(req, res, next) {
 			res.render('docs/templates.jade');
+		},
+
+		tags: function(req, res, next) {
+			res.render('docs/tags.jade');
 		}
 	},
 

@@ -48,6 +48,7 @@ app.get('/tags/:id', Routes.tags.view);
 app.get('/docs', Routes.docs.index);
 app.get('/docs/mail', Routes.docs.mail);
 app.get('/docs/templates', Routes.docs.templates);
+app.get('/docs/tags', Routes.docs.tags);
 
 app.get('/data/mail', Routes.data.mail);
 
