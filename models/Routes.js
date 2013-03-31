@@ -1,5 +1,6 @@
 var Key = require(__dirname + '/Key.js');
 var Template = require(__dirname + '/Template.js');
+var Tag = require(__dirname + '/Tag.js');
 var Data = require(__dirname + '/Data.js');
 
 var logger = require(__dirname + '/../lib/logger.js');
@@ -47,12 +48,20 @@ var Routes = {
 		},
 
 		add: function(req, res, next) {
-			Key.create(function(err, id) {
+			var theKey = Key.factory();
+
+			theKey.setUniqueKey(function(err) {
 				if (err) {
 					next(new ServerError(err));
 				} else {
-					req.flash('success', 'Api key successfully created.');
-					res.redirect('/keys');
+					theKey.save(function(err) {
+						if (err) {
+							next(new ServerError(err));
+						} else {
+							req.flash('success', 'Api key "' + theKey.key + '" successfully created.');
+							res.redirect('/keys');
+						}
+					});
 				}
 			});
 		}
@@ -98,27 +107,22 @@ var Routes = {
 		},
 
 		create: function(req, res, next) {
-			var theTemplate = Template.factory();
+			var theTemplate = Template.factory(req.body);
 
-			theTemplate.set(req.body);
-			if (theTemplate.validate()) {
-				Template.create(theTemplate, function(err, theTemplate) {
-					if (err) {
-						next(new ServerError(err));
-					} else {
-						req.flash('success', 'Template successfully updated.');
-						res.redirect('/templates/' + theTemplate.id);
-					}
-				});
-			} else {
-				res.flash('error', theTemplate.firstError());
+			theTemplate.save(function(err) {
+				if (err) {
+					res.flash('error', err);
 
-				res.render('templates/form.jade', {
-					update: false,
-					form: theTemplate.toHtml(),
-					template: theTemplate
-				});
-			}
+					res.render('templates/form.jade', {
+						update: false,
+						form: theTemplate.toHtml(),
+						template: theTemplate
+					});
+				} else {
+					req.flash('success', 'Template successfully created.');
+					res.redirect('/templates/' + theTemplate.id);
+				}
+			});
 		},
 
 		edit: function(req, res, next) {
@@ -146,37 +150,176 @@ var Routes = {
 				} else {
 					theTemplate.set(req.body);
 
-					if (theTemplate.validate()) {
-						Template.update(theTemplate, function(err, theTemplate) {
-							if (err) {
-								next(new ServerError(err));
-							} else {
-								req.flash('success', 'Template successfully updated.');
-								res.redirect('/templates/' + theTemplate.id);
-							}
-						});
-					} else {
-						res.flash('error', theTemplate.firstError());
+					theTemplate.save(function(err) {
+						if (err) {
+							res.flash('error', err);
 
-						res.render('templates/form.jade', {
-							update: true,
-							form: theTemplate.toHtml(),
-							template: theTemplate
+							res.render('templates/form.jade', {
+								update: true,
+								form: theTemplate.toHtml(),
+								template: theTemplate
+							});
+						} else {
+							req.flash('success', 'Template successfully updated.');
+							res.redirect('/templates/' + theTemplate.id);
+						}
+					});
+				}
+			});
+		},
+
+		remove: function(req, res, next) {
+			Template.find(req.params.id, function(err, theTemplate) {
+				if (err) {
+					next(new ServerError(err));
+				} else if (!theTemplate) {
+					next(new NotFoundError('Could not find the template!'));
+				} else {
+					theTemplate.remove(function(err) {
+						if (err) {
+							next(new ServerError(err));
+						} else {
+							req.flash('info', 'Template successfully deleted.');
+							res.redirect('/templates');
+						}
+					});
+				}
+			});
+		}
+	},
+
+	tags: {
+		index: function(req, res, next) {
+			Tag.findAll(function(err, tags) {
+				if (err) {
+					next(new ServerError(err));
+				} else {
+					res.render('tags/index.jade', {
+						tags: tags
+					});
+				}
+			});
+		},
+
+		view: function(req, res, next) {
+			Tag.find(req.params.id, function(err, theTag) {
+				if (err) {
+					next(new ServerError(err));
+				} else {
+					if (!theTag) {
+						req.flash('warning', 'Could not find the tag!');
+						res.redirect('/tags');
+					} else {
+						res.render('tags/view.jade', {
+							tag: theTag
 						});
 					}
 				}
 			});
 		},
 
-		remove: function(req, res, next) {
-			Template.remove(req.params.id, function(err) {
+		add: function(req, res, next) {
+			var theTag = Tag.factory();
+
+			res.render('tags/form.jade', {
+				update: false,
+				form: theTag.toHtml()
+			});
+		},
+
+		create: function(req, res, next) {
+			var theTag = Tag.factory(req.body);
+
+			theTag.save(function(err) {
 				if (err) {
-					next(new ServerError(err));
+					res.flash('error', err);
+
+					res.render('tags/form.jade', {
+						update: false,
+						form: theTag.toHtml(),
+						tag: theTag
+					});
 				} else {
-					req.flash('info', 'Template successfully deleted.');
-					res.redirect('/templates');
+					req.flash('success', 'Tag successfully created.');
+					res.redirect('/tags/' + theTag.id);
 				}
 			});
+		},
+
+		edit: function(req, res, next) {
+			Tag.find(req.params.id, function(err, theTag) {
+				if (err) {
+					next(new ServerError(err));
+				} else if (!theTag) {
+					next(new NotFoundError('Could not find the tag!'));
+				} else {
+					res.render('tags/form.jade', {
+						update: true,
+						form: theTag.toHtml(),
+						tag: theTag
+					});
+				}
+			});
+		},
+
+		update: function(req, res, next) {
+			Tag.find(req.params.id, function(err, theTag) {
+				if (err) {
+					next(new ServerError(err));
+				} else if (!theTag) {
+					next(new NotFoundError('Could not find the tag!'));
+				} else {
+					theTag.set(req.body);
+
+					theTag.save(function(err) {
+						if (err) {
+							res.flash('error', err);
+
+							res.render('tags/form.jade', {
+								update: true,
+								form: theTag.toHtml(),
+								tag: theTag
+							});
+						} else {
+							req.flash('success', 'Tag successfully updated.');
+							res.redirect('/tags/' + theTag.id);
+						}
+					});
+				}
+			});
+		},
+
+		remove: function(req, res, next) {
+			Tag.find(req.params.id, function(err, theTag) {
+				if (err) {
+					next(new ServerError(err));
+				} else if (!theTag) {
+					next(new NotFoundError('Could not find the tag!'));
+				} else {
+					theTag.remove(function(err) {
+						if (err) {
+							next(new ServerError(err));
+						} else {
+							req.flash('info', 'Tag successfully deleted.');
+							res.redirect('/tags');
+						}
+					});
+				}
+			});
+		}
+	},
+
+	reports: {
+		links: function(req, res, next) {
+			res.render('reports/links.jade');
+		},
+
+		opens: function(req, res, next) {
+			res.render('reports/opens.jade');
+		},
+
+		tags: function(req, res, next) {
+			res.render('reports/tags.jade');
 		}
 	},
 
@@ -191,12 +334,36 @@ var Routes = {
 
 		templates: function(req, res, next) {
 			res.render('docs/templates.jade');
+		},
+
+		tags: function(req, res, next) {
+			res.render('docs/tags.jade');
 		}
 	},
 
 	data: {
-		mail: function(req, res, next) {
-			Data.mail(function(err, data) {
+		index: function(req, res, next) {
+			Data.index(function(err, data) {
+				if (err) {
+					next(new ServerError(err));
+				} else {
+					res.json(200, data);
+				}
+			});
+		},
+
+		tags: function(req, res, next) {
+			Data.tags(function(err, data) {
+				if (err) {
+					next(new ServerError(err));
+				} else {
+					res.json(200, data);
+				}
+			});
+		},
+
+		links: function(req, res, next) {
+			Data.links(function(err, data) {
 				if (err) {
 					next(new ServerError(err));
 				} else {

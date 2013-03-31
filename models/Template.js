@@ -1,32 +1,32 @@
+var BaseModel = require(__dirname + '/BaseModel.js');
+var Validator = require(__dirname + '/Validator.js').Validator;
+var Filter = require(__dirname + '/Validator.js').Filter;
+var sanitize = require(__dirname + '/Validator.js').sanitize;
+
 var db = require(__dirname + '/../lib/db.js');
 var logger = require(__dirname + '/../lib/logger.js');
 
 var _ = require('underscore');
-var Validator = require('validator').Validator;
-var Filter = require('validator').Filter;
-var sanitize = require('validator').sanitize;
 
-Validator.prototype.error = function (msg) {
-	this._errors.push(msg);
-	return this;
-};
+function TemplateModel(attributes, isNewRecord) {
+	this._name = 'template';
+	this._table = '{{template}}';
 
-Validator.prototype.getErrors = function () {
-	return this._errors;
-};
+	this.init(attributes, isNewRecord);
 
-Filter.prototype.nl2br = function() {
-    this.modify(this.str.replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1<br />$2'));
-    return this.str;
-};
-
-function TemplateModel(attributes) {
-	this.errors = [];
-	this.v = new Validator();
+	this.set({
+		id: attributes.id || null,
+		name: attributes.name || '',
+		description: attributes.description || '',
+		html: attributes.html || '',
+		plain: attributes.plain || '',
+		created: attributes.created || null,
+		updated: attributes.updated || '0000-00-00 00:00:00'
+	});
 
 	this.attributes = [
 		{
-			name: 'slug',
+			name: 'name',
 			title: 'Slug',
 			type: 'input'
 		},
@@ -47,88 +47,94 @@ function TemplateModel(attributes) {
 		}
 	];
 
-	this.toHtml = function() {
-		var html = '';
+	this.validate = function(cb) {
+		if (this.name)
+			this.v.check(this.name).len(4, 100);
 
-		for (var i = 0; i < this.attributes.length; i++) {
-			html += '<div class="row">';
-			html += '<div class="large-12 columns">';
-			html += '<label for="' + this.attributes[i].name + '">' + this.attributes[i].title + '</label>';
-			switch (this.attributes[i].type) {
-				case 'input':
-					html += '<input type="text" name="' + this.attributes[i].name + '" id="' + this.attributes[i].name + '" value="' + this[this.attributes[i].name] + '">';
-					break;
-				case 'textarea':
-					html += '<textarea name="' + this.attributes[i].name + '" id="' + this.attributes[i].name + '">' + this[this.attributes[i].name] + '</textarea>';
-					break;
-			}
-			html += '</div>';
-			html += '</div>';
-		}
+		if (this.description)
+			this.v.check(this.description).len(0, 255);
 
-		return html;
-	};
-
-	this.validate = function() {
-		this.v.check(this.slug).len(4, 100);
-		this.v.check(this.description).len(0, 255);
-
-		this.errors = this.v.getErrors();
-
-		return (this.errors.length === 0);
-	};
-
-	this.getErrors = function() {
-		return this.errors;
-	};
-
-	this.getFirstError = function() {
-		if (this.errors.length)
-			return this.errors[0];
-		else
-			return false;
+		return cb(this.afterValidate(this.v.getErrors()));
 	};
 
 	this.sanitize = function() {
-		this.slug = sanitize(this.slug).trim();
+		this.name = sanitize(this.name).trim();
 		this.description = sanitize(this.description).trim();
 		this.html = sanitize(this.html).trim();
 		this.html = sanitize(this.html).xss();
 		this.plain = sanitize(this.plain).trim();
 		this.plain = sanitize(this.plain).xss();
-		this.plain = sanitize(this.plain).nl2br();
 	};
 
-	this.set = function(data) {
-		this.slug = data.slug;
-		this.description = data.description;
-		this.html = data.html;
-		this.plain = data.plain;
+	this.create = function(cb) {
+		logger.debug('Adding template to database...');
 
-		if (data.id)
-			this.id = data.id;
+		var _this = this;
 
-		if (data.created)
-			this.created = data.created;
+		db.query(
+			'INSERT INTO {{template}}(`name`, `description`, `html`, `plain`) VALUES(:name, :description, :html, :plain)',
+			{
+				name: this.name,
+				description: this.description,
+				html: this.html,
+				plain: this.plain
+			},
+			function(err, result) {
+				if (err) {
+					logger.error('Could not insert template into database!', err);
+					return cb('Error while creating template!');
+				} else {
+					_this.id = result.insertId;
+					logger.verbose('New template #' + result.insertId + ' created.');
 
-		if (data.updated)
-			this.updated = data.updated;
+					return cb(null);
+				}
+			}
+		);
+	},
 
-		this.sanitize();
+	this.update = function(cb) {
+		logger.debug('Updating template #' + this.id + ' to database...');
+
+		var _this = this;
+		var updated = new Date();
+
+		db.query(
+			'UPDATE {{template}} SET `name` = :name, `description` = :description, `html` = :html, `plain` = :plain, `created` = :created, `updated` = :updated WHERE `id` = :id',
+			{
+				name: this.name,
+				description: this.description,
+				html: this.html,
+				plain: this.plain,
+				created: this.created,
+				updated: updated,
+				id: this.id
+			},
+			function(err, result) {
+				if (err) {
+					logger.error('Could not update template in the database!', err);
+					return cb('Error while updating template!');
+				} else {
+					logger.verbose('Template #' + _this.id + ' updated.');
+
+					_this.updated = updated;
+					return cb(null);
+				}
+			}
+		);
 	};
-
-	this.set({
-		id: attributes.id || null,
-		slug: attributes.slug || null,
-		description: attributes.description || null,
-		html: attributes.html || null,
-		plain: attributes.plain || null,
-		created: attributes.created || null,
-		updated: attributes.updated || '0000-00-00 00:00:00'
-	});
 }
 
+TemplateModel.prototype = new BaseModel();
+
 var Template = {
+	factory: function(data) {
+		if (data)
+			return new TemplateModel(data);
+		else
+			return new TemplateModel({});
+	},
+
 	findAll: function(cb) {
 		logger.debug('Getting all templates from database...');
 
@@ -163,110 +169,30 @@ var Template = {
 					return cb(null, null);
 				} else {
 					logger.debug('Found template by ID #' + id + '.');
-					return cb(null, new TemplateModel(templates[0]));
+					return cb(null, new TemplateModel(templates[0], false));
 				}
 			}
 		);
 	},
 
-	findBySlug: function(slug, cb) {
-		logger.debug('Getting template by slug "' + slug + '"...');
+	findByName: function(name, cb) {
+		logger.debug('Getting template by name "' + name + '"...');
 
 		db.query(
-			'SELECT * FROM {{template}} WHERE `slug` = :slug LIMIT 1',
+			'SELECT * FROM {{template}} WHERE `name` = :name LIMIT 1',
 			{
-				slug: slug
+				name: name
 			},
 			function(err, templates) {
 				if (err) {
-					logger.error('Error while getting template by slug!', err);
+					logger.error('Error while getting template by name!', err);
 					return cb('Error while getting template!', null);
 				} else if (!templates.length) {
-					logger.warn('Could not find template by slug "' + slug + '"!');
+					logger.warn('Could not find template by name "' + name + '"!');
 					return cb(null, null);
 				} else {
-					logger.debug('Found template by slug "' + slug + '".');
-					return cb(null, new TemplateModel(templates[0]));
-				}
-			}
-		);
-	},
-
-	factory: function() {
-		return new TemplateModel({});
-	},
-
-	create: function(theTemplate, cb) {
-		logger.debug('Adding template to database...');
-
-		var _this = this;
-
-		db.query(
-			'INSERT INTO {{template}}(`slug`, `description`, `html`, `plain`) VALUES(:slug, :description, :html, :plain)',
-			{
-				slug: theTemplate.slug,
-				description: theTemplate.description,
-				html: theTemplate.html,
-				plain: theTemplate.plain
-			},
-			function(err, result) {
-				if (err) {
-					logger.error('Could not insert template into database!', err);
-					return cb('Error while creating template!', null);
-				} else {
-					logger.verbose('New template #' + result.insertId + ' created.');
-
-					_this.find(result.insertId, function(err, theTemplate) {
-						return cb(err, theTemplate);
-					});
-				}
-			}
-		);
-	},
-
-	update: function(theTemplate, cb) {
-		logger.debug('Updating template #' + theTemplate.id + ' to database...');
-
-		var updated = new Date();
-
-		db.query(
-			'UPDATE {{template}} SET `slug` = :slug, `description` = :description, `html` = :html, `plain` = :plain, `updated` = :updated WHERE `id` = :id',
-			{
-				slug: theTemplate.slug,
-				description: theTemplate.description,
-				html: theTemplate.html,
-				plain: theTemplate.plain,
-				updated: updated,
-				id: theTemplate.id
-			},
-			function(err, result) {
-				if (err) {
-					logger.error('Could not update template in the database!', err);
-					return cb('Error while updating template!', null);
-				} else {
-					logger.verbose('Template #' + theTemplate.id + ' updated.');
-
-					theTemplate.updated = updated;
-					return cb(null, theTemplate);
-				}
-			}
-		);
-	},
-
-	remove: function(id, cb) {
-		logger.debug('Remove template #' + id);
-
-		db.query(
-			'DELETE FROM {{template}} WHERE `id` = :id',
-			{
-				id: id
-			},
-			function(err) {
-				if (err) {
-					logger.error('Error while deleting template!', err);
-					return cb('Error while deleting the template!');
-				} else {
-					return cb(null);
+					logger.debug('Found template by name "' + name + '".');
+					return cb(null, new TemplateModel(templates[0], false));
 				}
 			}
 		);

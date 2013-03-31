@@ -1,0 +1,18 @@
+extends ../layouts/main
+
+block content
+	div(class="large-12 columns")
+		h2 Tag Report
+
+		ul.breadcrumbs
+			li
+				a(href="/") Melone
+			li.unavailable
+				a Reports
+			li.current
+				a Tags
+
+		div#chart-tags(class="chart")
+
+block footer
+	script(src="/js/highcharts/highcharts.js")

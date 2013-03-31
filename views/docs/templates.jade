@@ -18,21 +18,13 @@ block content
 				include _sidebar
 			div(class="large-8 columns")
 				h3 Sending templates
-				p Sending mails with a saved template.
+				p Sending mails with is as easy as sending a mail. Just remove the <code>text</code> part from <code>html</code> and <code>plain</code> and add the template name to <code>content</code>
 				pre(class="prettyprint")
 					code(class="language-js")
 						|{
 						|  "key": "f8a6657dc19b61cbd142c57ebb381128",
 						|  "secret": "524f3bc30d23f70b300877885a48509c",
-						|  "to": [
-						|    {
-						|      "email": "receiver@gmail.com",
-						|      "name": "Tom Test",
-						|      "vars": {
-						|        "name": "Tom Test"
-						|      }
-						|    }
-						|  ],
+						|  "to": [...],
 						|  "subject": "Test Email",
 						|  "content": {
 						|    "template": "my-saved-welcome-template"
@@ -49,9 +41,4 @@ block content
 						|    "vars": {
 						|       "heading": "Hello"
 						|    }
-						|  },
-						|  "tracking": {
-						|    "open": true,
-						|    "links": true
 						|  }
-						|}

@@ -1,0 +1,36 @@
+extends ../layouts/main
+
+block content
+	div(class="large-12 columns")
+		h2 Documentation
+
+		ul.breadcrumbs
+			li
+				a(href="/") Melone
+			li
+				a(href="/docs") Documentation
+			li.current
+				a Tags
+
+		div(class="row full-width")
+			div(class="large-4 columns")
+				- var active = 'tags';
+				include _sidebar
+			div(class="large-8 columns")
+				h3 Sending mails with tags
+				p You optionally can add an array with tags to your email. This will help to segment your statistics later.
+				pre(class="prettyprint")
+					code(class="language-js")
+						|{
+						|  "key": "f8a6657dc19b61cbd142c57ebb381128",
+						|  "secret": "524f3bc30d23f70b300877885a48509c",
+						|  "to": [...],
+						|  "subject": "Test Email",
+						|  "content": {...},
+						|  "tags": [
+						|    "Welcome",
+						|    "Test",
+						|    "Contact",
+						|    "Registration"
+						|  ]
+						|}

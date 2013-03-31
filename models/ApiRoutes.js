@@ -77,7 +77,7 @@ var Routes = {
 		},
 
 		click: function(req, res, next) {
-			Tracking.click(req.params.id, function(err, redirect) {
+			Tracking.click(req.params.id, req.connection.remoteAddress, function(err, redirect) {
 				if (err) {
 					next(new NotFoundError('Could not find the link!'));
 				} else {

@@ -37,11 +37,26 @@ app.post('/templates/edit/:id', Routes.templates.update);
 app.get('/templates/remove/:id', Routes.templates.remove);
 app.get('/templates/:id', Routes.templates.view);
 
+app.get('/tags', Routes.tags.index);
+app.get('/tags/add', Routes.tags.add);
+app.post('/tags/add', Routes.tags.create);
+app.get('/tags/edit/:id', Routes.tags.edit);
+app.post('/tags/edit/:id', Routes.tags.update);
+app.get('/tags/remove/:id', Routes.tags.remove);
+app.get('/tags/:id', Routes.tags.view);
+
 app.get('/docs', Routes.docs.index);
 app.get('/docs/mail', Routes.docs.mail);
 app.get('/docs/templates', Routes.docs.templates);
+app.get('/docs/tags', Routes.docs.tags);
 
-app.get('/data/mail', Routes.data.mail);
+app.get('/reports/links', Routes.reports.links);
+app.get('/reports/opens', Routes.reports.opens);
+app.get('/reports/tags', Routes.reports.tags);
+
+app.get('/data/index', Routes.data.index);
+app.get('/data/links', Routes.data.links);
+app.get('/data/tags', Routes.data.tags);
 
 app.listen(config.app.port, function(err) {
 	if (err) {
