@@ -59,26 +59,32 @@ function BaseModel() {
 			this.sanitize();
 	};
 
-	this.afterValidate = function(errors) {
-		this.errors = errors;
+	this.afterValidate = function() {
+		this.errors = this.v.getErrors();
 
 		return (this.errors.length === 0) ? null : this.getFirstError();
 	};
 
 	this.save = function(cb) {
-		if (this.validate) {
-			if (this._isNewRecord) {
-				this.create(function(err) {
-					return cb(err);
-				});
+		logger.debug('Save model ' + this._name);
+
+		var _this = this;
+
+		this.validate(function(err) {
+			if (err) {
+				return cb(err);
 			} else {
-				this.update(function(err) {
-					return cb(err);
-				});
+				if (_this._isNewRecord) {
+					_this.create(function(err) {
+						return cb(err);
+					});
+				} else {
+					_this.update(function(err) {
+						return cb(err);
+					});
+				}
 			}
-		} else {
-			return cb(this.getFirstError());
-		}
+		});
 	};
 
 	this.remove = function(cb) {
