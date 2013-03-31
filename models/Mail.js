@@ -19,6 +19,10 @@ var Mail = function(params) {
 		this._tracking = params.tracking || null;
 	}
 
+	this._getApiUrl = function(path) {
+		return config.url + ':' + config.api.port + '/' + path;
+	};
+
 	this._insertRecipients = function(cb) {
 		logger.debug('Insert recipients into database...');
 		var _this = this;
@@ -75,12 +79,13 @@ var Mail = function(params) {
 	this._addTrackingOpen = function(text, theRecipient) {
 		logger.debug('Add open tracking to the mail...');
 
-		var trackingUrl = config.url + 'api/o/' + theRecipient.id + '.gif';
-		return text + '<img border="0" src="' + trackingUrl + '" width="1" height="1">';
+		return text + '<img border="0" src="' + this._getApiUrl('api/o/' + theRecipient.id + '.gif') + '" width="1" height="1">';
 	};
 
 	this._addTrackingLinksHtml = function(plain, html, theRecipient, cb) {
 		logger.debug('Add tracking links to html...');
+
+		var _this = this;
 		var links = html.match(/(https?:\/\/)?((([a-z\d]([a-z\d-]*[a-z\d])*)\.)+[a-z]{2,}|((\d{1,3}\.){3}\d{1,3}))(\:\d+)?(\/[-a-z\d%_.~+]*)*(\?[;&a-z\d%_.~+=-]*)?(\#[-a-z\d_]*)?/gm);
 		links = _.uniq(links);
 
@@ -103,7 +108,7 @@ var Mail = function(params) {
 						} else {
 							logger.debug('Replaced link ' + (linkCurrent + 1) + '/' + linkCount);
 
-							html = html.replace(theLink, config.url + 'api/l/' + result.insertId);
+							html = html.replace(theLink, _this._getApiUrl('api/l/' + result.insertId));
 
 							linkCurrent++;
 							if (linkCurrent >= linkCount) {
@@ -144,7 +149,7 @@ var Mail = function(params) {
 						} else {
 							logger.debug('Replaced link ' + (linkCurrent + 1) + '/' + linkCount);
 
-							plain = plain.replace(theLink, config.url + 'api/l/' + result.insertId);
+							plain = plain.replace(theLink, _this._getApiUrl('api/l/' + result.insertId));
 
 							linkCurrent++;
 							if (linkCurrent >= linkCount) {
@@ -380,7 +385,7 @@ var Mail = function(params) {
 						} else {
 							if (_this._tracking) {
 								if (_this._tracking.open) {
-									html = _this._addTrackingOpen(html, recipient);
+									theHtml = _this._addTrackingOpen(theHtml, recipient);
 								}
 							}
 
