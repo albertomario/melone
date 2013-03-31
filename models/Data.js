@@ -130,7 +130,7 @@ var Data = {
 								openedData = _this._toData(firstDate, opened);
 
 								db.query(
-									'SELECT COUNT(*) AS `count`, DATE(`clicked`) AS `date` FROM {{mail_link}} WHERE DATE(`clicked`) >= :first_date GROUP BY YEAR(`clicked`), MONTH(`clicked`), DAY(`clicked`) ORDER BY `clicked` ASC',
+									'SELECT COUNT(*) AS `count`, DATE(`clicked`) AS `date` FROM {{mail_link_click}} WHERE DATE(`clicked`) >= :first_date GROUP BY YEAR(`clicked`), MONTH(`clicked`), DAY(`clicked`) ORDER BY `clicked` ASC',
 									{
 										first_date: firstDate
 									},

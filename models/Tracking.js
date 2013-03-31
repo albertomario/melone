@@ -1,6 +1,8 @@
 var db = require(__dirname + '/../lib/db.js');
 var logger = require(__dirname + '/../lib/logger.js');
 
+var crypto = require('crypto');
+
 var Tracking = {
 	open: function(id, cb) {
 		logger.debug('Tracking email #' + id + ' opening event...');
@@ -53,7 +55,7 @@ var Tracking = {
 		);
 	},
 
-	click: function(id, cb) {
+	click: function(id, ip, cb) {
 		logger.debug('Tracking link #' + id + ' click event...');
 		var now = new Date();
 
@@ -74,31 +76,26 @@ var Tracking = {
 						return cb('No link found with this id!', null);
 					}
 				} else {
-					var testDate = new Date(theLink.clicked);
+					logger.debug('Saving link click event to database...');
 
-					if (!isNaN(testDate.getTime())) {
-						logger.debug('Link already clicked.');
-						return cb(null, theLink.url);
-					} else {
-						logger.debug('Saving link click event to database...');
+					var ipHash = crypto.createHash('sha256').update(ip).digest('hex');
 
-						db.query(
-							'UPDATE {{mail_link}} SET `clicked` = :clicked WHERE `id` = :id',
-							{
-								clicked: now,
-								id: theLink.id
-							},
-							function(err, result) {
-								if (err) {
-									logger.warn('Could not save link click event!', err);
-									return cb('Could not save event!');
-								} else {
-									logger.debug('Link click event saved.');
-									return cb(null, theLink.url);
-								}
+					db.query(
+						'INSERT INTO {{mail_link_click}}(`mail_link_id`, `ip_hash`) VALUES (:mail_link_id, :ip_hash)',
+						{
+							mail_link_id: theLink.id,
+							ip_hash: ipHash
+						},
+						function(err, result) {
+							if (err) {
+								logger.warn('Could not save link click event!', err);
+								return cb('Could not save event!');
+							} else {
+								logger.debug('Link click event saved.');
+								return cb(null, theLink.url);
 							}
-						);
-					}
+						}
+					);
 				}
 			}
 		);
