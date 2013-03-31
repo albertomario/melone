@@ -1,8 +1,7 @@
 $(function() {
 	if ($('#chart-sent').length) {
-		$.getJSON('/data/mail', function(data) {
+		$.getJSON('/data/index', function(data) {
 			if (data) {
-				console.log(data);
 				$('#chart-sent').highcharts({
 					chart: {
 						type: 'line',
@@ -29,7 +28,39 @@ $(function() {
 				});
 			} else {
 				console.log('Could not get data from "/data/mail"');
-				console.log('data');
+			}
+		});
+	}
+
+	if ($('#chart-tags').length) {
+		$.getJSON('/data/tags', function(data) {
+			if (data) {
+				$('#chart-tags').highcharts({
+					chart: {
+						type: 'line',
+						zoomType: 'x'
+					},
+					title: {
+						text: null
+					},
+					xAxis: {
+						allowDecimals: false,
+						type: 'datetime',
+						maxZoom: 7 * 24 * 3600000,
+						dateTimeLabelFormats: {
+							day: '%e. %b'
+						}
+					},
+					yAxis: {
+						min: 0,
+						title: {
+							text: null
+						}
+					},
+					series: data
+				});
+			} else {
+				console.log('Could not get data from "/data/mail"');
 			}
 		});
 	}

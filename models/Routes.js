@@ -309,6 +309,24 @@ var Routes = {
 		}
 	},
 
+	reports: {
+		mails: function(req, res, next) {
+			res.render('reports/mails.jade');
+		},
+
+		links: function(req, res, next) {
+			res.render('reports/links.jade');
+		},
+
+		opens: function(req, res, next) {
+			res.render('reports/opens.jade');
+		},
+
+		tags: function(req, res, next) {
+			res.render('reports/tags.jade');
+		}
+	},
+
 	docs: {
 		index: function(req, res, next) {
 			res.render('docs/index.jade');
@@ -328,8 +346,18 @@ var Routes = {
 	},
 
 	data: {
-		mail: function(req, res, next) {
-			Data.mail(function(err, data) {
+		index: function(req, res, next) {
+			Data.index(function(err, data) {
+				if (err) {
+					next(new ServerError(err));
+				} else {
+					res.json(200, data);
+				}
+			});
+		},
+
+		tags: function(req, res, next) {
+			Data.tags(function(err, data) {
 				if (err) {
 					next(new ServerError(err));
 				} else {
