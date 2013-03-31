@@ -310,10 +310,6 @@ var Routes = {
 	},
 
 	reports: {
-		mails: function(req, res, next) {
-			res.render('reports/mails.jade');
-		},
-
 		links: function(req, res, next) {
 			res.render('reports/links.jade');
 		},
@@ -358,6 +354,16 @@ var Routes = {
 
 		tags: function(req, res, next) {
 			Data.tags(function(err, data) {
+				if (err) {
+					next(new ServerError(err));
+				} else {
+					res.json(200, data);
+				}
+			});
+		},
+
+		links: function(req, res, next) {
+			Data.links(function(err, data) {
 				if (err) {
 					next(new ServerError(err));
 				} else {

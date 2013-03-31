@@ -27,7 +27,7 @@ $(function() {
 					series: data
 				});
 			} else {
-				console.log('Could not get data from "/data/mail"');
+				console.log('Could not get data from "/data/index"');
 			}
 		});
 	}
@@ -60,7 +60,40 @@ $(function() {
 					series: data
 				});
 			} else {
-				console.log('Could not get data from "/data/mail"');
+				console.log('Could not get data from "/data/tags"');
+			}
+		});
+	}
+
+	if ($('#chart-links').length) {
+		$.getJSON('/data/links', function(data) {
+			if (data && data.series && data.categories) {
+				console.log(data);
+				$('#chart-links').highcharts({
+					chart: {
+						type: 'bar'
+					},
+					title: {
+						text: null
+					},
+					xAxis: {
+						categories: data.categories,
+						title: {
+							text: null
+						}
+					},
+					yAxis: {
+						min: 0,
+						allowDecimals: false,
+						type: 'category',
+						title: {
+							text: 'Unqiue clicks for this url'
+						}
+					},
+					series: data.series
+				});
+			} else {
+				console.log('Could not get data from "/data/links"');
 			}
 		});
 	}

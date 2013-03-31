@@ -1,6 +1,7 @@
 var db = require(__dirname + '/../lib/db.js');
 var logger = require(__dirname + '/../lib/logger.js');
 
+var url = require('url');
 var _ = require('underscore');
 
 var Data = {
@@ -84,6 +85,40 @@ var Data = {
 		});
 
 		return series;
+	},
+
+	_toLinkData: function(results) {
+		var series = [];
+		var data = [];
+		var categories = [];
+
+		_.each(results, function(result) {
+			data.push([result.url, result.count]);
+
+			var urlData = url.parse(result.url);
+			var urlString = '';
+
+			if (urlData) {
+				if (urlData.host)
+					urlString += urlData.host;
+				if (urlData.path)
+					urlString += urlData.path;
+				if (urlData.hash)
+					urlString += urlData.hash;
+				categories.push(urlString);
+			}
+			else
+				categories.push(result.url);
+		});
+
+		series.push({
+			data: data
+		});
+
+		return {
+			series: series,
+			categories: categories
+		};
 	},
 
 	index: function(cb) {
@@ -181,7 +216,7 @@ var Data = {
 	},
 
 	tags: function(cb) {
-		logger.log('Get report for tags...');
+		logger.log('Get tag report from database...');
 
 		var _this = this;
 		var firstDate = this._getFirstDate();
@@ -197,10 +232,34 @@ var Data = {
 			},
 			function(err, results) {
 				if (err) {
-					logger.error('Could not get report for tags!', err);
-					return cb('Could not get report for tags!');
+					logger.error('Could not get tag report from database!', err);
+					return cb('Could not get tag report!', null);
 				} else {
+					logger.debug('Got tag report from database.');
 					return cb(null, _this._toTagData(firstDate, results));
+				}
+			}
+		);
+	},
+
+	links: function(cb) {
+		logger.log('Get link report from database...');
+
+		var _this = this;
+
+		db.query(
+			'SELECT {{mail_link}}.`url` AS `url`, COUNT({{mail_link_click}}.`mail_link_id`) AS `count` ' +
+				'FROM  {{mail_link}}, {{mail_link_click}} ' +
+				'WHERE {{mail_link}}.`id` = {{mail_link_click}}.`mail_link_id` ' +
+				'GROUP BY {{mail_link}}.`url` ' +
+				'LIMIT 20',
+			function(err, results) {
+				if (err) {
+					logger.error('Could not get link report from database!', err);
+					return cb('Could not get link report!', null);
+				} else {
+
+					return cb(null, _this._toLinkData(results));
 				}
 			}
 		);
