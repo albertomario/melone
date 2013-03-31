@@ -87,6 +87,8 @@ function KeyModel(attributes, isNewRecord) {
 	this.validate = function(cb) {
 		logger.debug('Validating api key...');
 
+		var _this = this;
+
 		Key.findByKeyAndSecret(this.key, this.secret, function(err, theKey) {
 			if (err) {
 				return cb(err);
@@ -94,9 +96,8 @@ function KeyModel(attributes, isNewRecord) {
 				return cb(null);
 			} else {
 				logger.debug('Duplicate key found!');
-				this._errors.push('Duplicate key found!');
 
-				return cb(this.afterValidate(this.v.getErrors()));
+				return cb('Duplicate key found!');
 			}
 		});
 	};
@@ -135,6 +136,7 @@ var Key = {
 
 	findAll: function(cb) {
 		logger.debug('Get all api keys from database...');
+
 		db.query('SELECT * FROM {{key}} LIMIT 100', function(err, keys) {
 			if (err) {
 				logger.error('Could not get api keys from database!', err);
@@ -148,6 +150,7 @@ var Key = {
 
 	findByKeyAndSecret: function(key, secret, cb) {
 		logger.debug('Finding api key...');
+
 		db.query(
 			'SELECT * FROM {{key}} WHERE `key` = :key AND `secret` = :secret LIMIT 1',
 			{
@@ -159,7 +162,7 @@ var Key = {
 					logger.error('Error while finding api key', err);
 					return cb('Error while finding the api key!', null);
 				} else if(!theKey.length) {
-					logger.warn('Could not find the api key!');
+					logger.verbose('No api key found.');
 					return cb(null, null);
 				} else {
 					logger.verbose('Api key found.');
