@@ -1,6 +1,6 @@
 # Melone Transaction Mail API
 
-[![Build Status](https://secure.travis-ci.org/t-visualappeal/melone.png)](http://travis-ci.org/t-visualappeal/melone)
+[![Build Status](https://secure.travis-ci.org/t-visualappeal/melone.png)](http://travis-ci.org/t-visualappeal/melone) [![Dependency Status](https://gemnasium.com/t-visualappeal/melone.png)](https://gemnasium.com/t-visualappeal/melone)
 
 Start the interface with `node server.js` and the api (send/track emails) with `node api.js`.
 
