@@ -23,7 +23,7 @@ function BaseModel() {
 		if (this.errors.length)
 			return this.errors[0];
 		else
-			return false;
+			return null;
 	};
 
 	this.toHtml = function() {
@@ -59,8 +59,13 @@ function BaseModel() {
 			this.sanitize();
 	};
 
-	this.afterValidate = function() {
+	this.afterValidate = function(errors) {
+		var _this = this;
+
 		this.errors = this.v.getErrors();
+		_.each(errors, function(err) {
+			_this.errors.push(err);
+		});
 
 		return (this.errors.length === 0) ? null : this.getFirstError();
 	};
