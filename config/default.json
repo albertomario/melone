@@ -1,0 +1,29 @@
+{
+	"url": "http://localhost",
+	"app": {
+		"port": 8000,
+		"sessionSecret": "bgqount823hgebng802gb",
+		"salt": "gnse08h1gpo3naegh8021n"
+	},
+	"api": {
+		"port": 8080,
+		"mailer": {
+			"service": "Gmail",
+			"auth": {
+				"user": "test@gmail.com",
+				"pass": "123456"
+			}
+		},
+		"mailOptions": {
+			"from": "From Me <test@gmail.com>"
+		},
+		"type": "SMTP"
+	},
+	"db": {
+		"host": "localhost",
+		"username": "user_melone",
+		"password": "123456789",
+		"database": "melone",
+		"prefix": "dev_"
+	}
+}
