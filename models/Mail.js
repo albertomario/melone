@@ -43,7 +43,7 @@ var Mail = function(params) {
 		var recipients = [];
 
 		_.each(to, function(theRecipient) {
-			logger.debug('Insert recipient ' + recipientCurrent + 1 + '/' + recipientsCount);
+			logger.debug('Insert recipient ' + (recipientCurrent + 1) + '/' + recipientsCount);
 
 			db.query(
 				'INSERT INTO {{mail_to}}(`mail_id`, `email`, `name`) VALUES(:mail_id, :email, :name)',
