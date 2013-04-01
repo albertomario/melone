@@ -27,7 +27,7 @@ var Mail = function(params) {
 	};
 
 	this._getLinks = function(str) {
-		var exp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!-\/]))?/gi;
+		var exp = /((https?:\/\/)?[\w-]+(\.[\w-]+)+\.?(:\d+)?(\/\S*)?)/gi;
 		var urlReg = new RegExp(exp);
 		var links = str.match(urlReg);
 

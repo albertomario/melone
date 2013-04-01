@@ -56,54 +56,28 @@ module.exports.mail = {
 	},
 
 	testGetLinks: function(test) {
-		test.expect(3);
+		test.expect(1);
 
 		var theMail = new Mail();
 
-		var html = '<b>Node.js</b> is a server-side <a href="https://en.wikipedia.org/wiki/S' +
-			'oftware_system" title="Software system">software system</a> designed for' +
-			' writing <a href="http://en.wikipedia.org/wiki/Scalability" title="Scala' +
-			'bility">scalable</a> Internet applications, notably <a href="http://en.' +
-			'wikipedia.org/wiki/Web_server" title="Web server">web servers</a>.<sup ' +
-			' id="cite_ref-1" class="reference"><a href="#cite_note-1"><span>[</span>' +
-			'1<span>]</span></a></sup> Programs are written on the server side in <a' +
-			'  href="http://en.wikipedia.org/wiki/JavaScript" title="JavaScript">Java' +
-			' Script</a>, using <a href="http://en.wikipedia.org/wiki/Event-driven_a' +
-			'rchitecture" title="Event-driven architecture">event-driven</a>, <a hr' +
-			'ef="https://en.wikipedia.org/wiki/Asynchronous_I/O" title="Asynchronous' +
-			' I/O">asynchronous I/O</a> to minimize <a href="en.wikipedia.or' +
-			'g/wiki/Overhead_(computing)" title="Overhead (computing)">overhead</a' +
-			'> and maximize <a href="http://en.wikipedia.org/wiki/Scalability" tit' +
-			'le="Scalability">scalability</a>.<sup id="cite_ref-2" class="referenc' +
-			'e"><a href="#cite_note-2"><span>[</span>2<span>]</span></a></sup></p>' +
-			'<p><i>Node.js</i> creates a web server by itself, making it unnecessary ' +
-			'to use web server software such as <a href="http://en.wikipedia.org/wiki' +
-			'/Apache_(web_server)" title="Apache (web server)" class="mw-redirect">Ap' +
-			'ache</a> or <a href="http://en.wikipedia.org/wiki/Lighttpd" title="Light' +
-			'tpd">Lighttpd</a> and allowing full control of how the web server actual' +
-			'ly works. Node.js enables web developers to create an entire web applica' +
-			'tion on both server-side and client-side in one language (JavaScript).</' +
-			'p>';
+		var text = '"http://www.test1.de" ' +
+			'This is a www.test2.de url ' +
+			'This is a http://www.test3.de url ' +
+			'http://www.test4.de ' +
+			'https://www.test5.de ' +
+			'http://test6.de ' +
+			'https://test7.de ' +
+			'www.test8.de ' +
+			'test9.de ' +
+			'test10.de:80 ' +
+			'test11.de/?query=search ' +
+			'test12.de/?query=search&asd=%20wasd ' +
+			'test13.de/path/to/test ' +
+			'test14.de#!hashtag ';
 
-		var plain = 'Node.js http://nodejs.org is a server-side software system d' +
-			'esigned for writing scalable Internet applications, notably web servers.' +
-			' Programs are written on the server side in JavaScript, using event-driv' +
-			'en, asynchronous I/O to minimize overhead and maximize scalability. Node' +
-			'.js creates a web server by itself, making it unnecessary to use web ser' +
-			'ver software such as Apache http://apache.org or Lighttpd http://www.lighttpd.net and ' +
-			'allowing full control of how the web server actually works. Node.js enab' +
-			'les web developers to create an entire web application on both server-si' +
-			'de and client-side in one language (JavaScript).';
+		var links = theMail._getLinks(text);
 
-		var special = 'http://www.google.com?q=test asd http://www.google.com/test http://google.com#hashtag';
-
-		var htmlLinks = theMail._getLinks(html);
-		var plainLinks = theMail._getLinks(plain);
-		var specialLinks = theMail._getLinks(special);
-
-		test.strictEqual(htmlLinks.length, 8, 'There must be 8 links in the html text!');
-		test.strictEqual(plainLinks.length, 3, 'There must be 3 links in the plain text!');
-		test.strictEqual(specialLinks.length, 3, 'There must be 3 links in the special text!');
+		test.strictEqual(links.length, 14, 'There must be 14 links!');
 
 		test.done();
 	},
@@ -177,8 +151,8 @@ module.exports.mail = {
 		var recipient = {
 			id: 1
 		};
-		var html = 'Convert http://www.example.com';
 		var plain = 'Do not touch http://www.example.com';
+		var html = 'Convert http://www.example.com';
 		var htmlTracked = 'Convert ' + theMail._getApiUrl('api/l/1');
 
 		theMail.plain = plain;
@@ -200,8 +174,8 @@ module.exports.mail = {
 		var recipient = {
 			id: 1
 		};
-		var html = 'Do not touch http://www.example.com';
 		var plain = 'Convert http://www.example.com';
+		var html = 'Do not touch http://www.example.com';
 		var plainTracked = 'Convert ' + theMail._getApiUrl('api/l/1');
 
 		theMail.plain = plain;
