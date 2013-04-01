@@ -1,7 +1,8 @@
 var BaseModel = require(__dirname + '/BaseModel.js');
-var Validator = require(__dirname + '/Validator.js').Validator;
-var Filter = require(__dirname + '/Validator.js').Filter;
-var sanitize = require(__dirname + '/Validator.js').sanitize;
+
+var Validator = require(__dirname + '/../components/Validator.js').Validator;
+var Filter = require(__dirname + '/../components/Validator.js').Filter;
+var sanitize = require(__dirname + '/../components/Validator.js').sanitize;
 
 var logger = require(__dirname + '/../lib/logger.js');
 var db = require(__dirname + '/../lib/db.js');
@@ -14,13 +15,6 @@ function KeyModel(attributes, isNewRecord) {
 	this._table = '{{key}}';
 
 	this.init(attributes, isNewRecord);
-
-	this.set({
-		id: attributes.id || null,
-		key: attributes.key || null,
-		secret: attributes.secret || null,
-		created: attributes.created || null
-	});
 
 	this. _createRandomHashes = function() {
 		logger.debug('Creating random hash...');
@@ -122,6 +116,13 @@ function KeyModel(attributes, isNewRecord) {
 			}
 		);
 	};
+
+	this.set({
+		id: attributes.id || null,
+		key: attributes.key || null,
+		secret: attributes.secret || null,
+		created: attributes.created || null
+	});
 }
 
 KeyModel.prototype = new BaseModel();

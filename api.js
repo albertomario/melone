@@ -1,5 +1,6 @@
-var Routes = require(__dirname + '/models/ApiRoutes.js');
 var Key = require(__dirname + '/models/Key.js');
+
+var Routes = require(__dirname + '/components/ApiRoutes.js');
 
 var config = require(__dirname + '/lib/config.js');
 var logger = require(__dirname + '/lib/logger.js');

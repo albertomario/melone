@@ -1,4 +1,4 @@
-var Routes = require(__dirname + '/models/Routes.js');
+var Routes = require(__dirname + '/components/Routes.js');
 
 var config = require(__dirname + '/lib/config.js');
 var logger = require(__dirname + '/lib/logger.js');

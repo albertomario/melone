@@ -76,6 +76,8 @@ function BaseModel() {
 			} else {
 				if (_this._isNewRecord) {
 					_this.create(function(err) {
+						_this._isNewRecord = false;
+
 						return cb(err);
 					});
 				} else {

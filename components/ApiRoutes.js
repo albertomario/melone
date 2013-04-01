@@ -1,5 +1,6 @@
-var Key = require(__dirname + '/Key.js');
-var Mail = require(__dirname + '/Mail.js');
+var Key = require(__dirname + '/../models/Key.js');
+var Mail = require(__dirname + '/../models/Mail.js');
+
 var Tracking = require(__dirname + '/Tracking.js');
 
 var logger = require(__dirname + '/../lib/logger.js');

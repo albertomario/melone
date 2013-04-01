@@ -1,7 +1,8 @@
 var BaseModel = require(__dirname + '/BaseModel.js');
-var Validator = require(__dirname + '/Validator.js').Validator;
-var Filter = require(__dirname + '/Validator.js').Filter;
-var sanitize = require(__dirname + '/Validator.js').sanitize;
+
+var Validator = require(__dirname + '/../components/Validator.js').Validator;
+var Filter = require(__dirname + '/../components/Validator.js').Filter;
+var sanitize = require(__dirname + '/../components/Validator.js').sanitize;
 
 var db = require(__dirname + '/../lib/db.js');
 var logger = require(__dirname + '/../lib/logger.js');
