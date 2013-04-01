@@ -6,13 +6,16 @@
 		"salt": "abcdefghijklmnopqrstuvwxyz0123456789"
 	},
 	"api": {
-		"port": 8080
+		"port": 8080,
+		"mailer": {},
+		"mailOptions": {},
+		"type": "SMTP"
 	},
 	"db": {
 		"host": "localhost",
-		"username": "travis",
-		"password": "",
-		"database": "melone",
+		"username": "vau_melone",
+		"password": "vmVUbRFGamH2C5Ad",
+		"database": "va_melone",
 		"prefix": "test_"
 	}
 }
