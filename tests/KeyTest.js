@@ -1,5 +1,7 @@
-var Sql = require(__dirname + '/../models/Sql.js');
 var Key = require(__dirname + '/../models/Key.js');
+
+var Sql = require(__dirname + '/../components/Sql.js');
+
 var config = require(__dirname + '/../lib/config.js');
 var db = require(__dirname + '/../lib/db.js');
 
