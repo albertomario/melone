@@ -118,6 +118,18 @@ module.exports.key = {
 		});
 	},
 
+	findNothing: function(test) {
+		test.expect(2);
+
+		Key.findAll(function(err, keys) {
+			test.ifError(err);
+
+			test.strictEqual(keys.length, 0, 'No keys should be found!');
+
+			test.done();
+		});
+	},
+
 	findByKeyAndSecret: function(test) {
 		test.expect(4);
 

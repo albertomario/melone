@@ -140,8 +140,29 @@ module.exports.tag = {
 		});
 	},
 
+	findNot: function(test) {
+		test.expect(3);
+
+		var theTag = Tag.factory({
+			name: 'My Tag',
+			description: 'My test tag.'
+		});
+
+		theTag.save(function(err) {
+			test.ifError(err);
+
+			Tag.find(theTag.id + 1, function(err, foundTag) {
+				test.ifError(err);
+
+				test.strictEqual(foundTag, null, 'No tag should be found!');
+
+				test.done();
+			});
+		});
+	},
+
 	findAll: function(test) {
-		test.expect(4);
+		test.expect(6);
 
 		async.waterfall([
 			function(cb) {
@@ -182,6 +203,24 @@ module.exports.tag = {
 			}
 		], function(err) {
 			test.ifError(err);
+
+			Tag.findAll(function(err, tags) {
+				test.ifError(err);
+
+				test.strictEqual(tags.length, 3, '3 tags should be found!');
+
+				test.done();
+			});
+		});
+	},
+
+	findNothing: function(test) {
+		test.expect(2);
+
+		Tag.findAll(function(err, tags) {
+			test.ifError(err);
+
+			test.strictEqual(tags.length, 0, 'No tags should be found!');
 
 			test.done();
 		});
