@@ -1,7 +1,8 @@
 var BaseModel = require(__dirname + '/BaseModel.js');
-var Validator = require(__dirname + '/Validator.js').Validator;
-var Filter = require(__dirname + '/Validator.js').Filter;
-var sanitize = require(__dirname + '/Validator.js').sanitize;
+
+var Validator = require(__dirname + '/../components/Validator.js').Validator;
+var Filter = require(__dirname + '/../components/Validator.js').Filter;
+var sanitize = require(__dirname + '/../components/Validator.js').sanitize;
 
 var db = require(__dirname + '/../lib/db.js');
 var logger = require(__dirname + '/../lib/logger.js');
@@ -14,20 +15,10 @@ function TemplateModel(attributes, isNewRecord) {
 
 	this.init(attributes, isNewRecord);
 
-	this.set({
-		id: attributes.id || null,
-		name: attributes.name || '',
-		description: attributes.description || '',
-		html: attributes.html || '',
-		plain: attributes.plain || '',
-		created: attributes.created || null,
-		updated: attributes.updated || '0000-00-00 00:00:00'
-	});
-
 	this.attributes = [
 		{
 			name: 'name',
-			title: 'Slug',
+			title: 'Name',
 			type: 'input'
 		},
 		{
@@ -48,13 +39,17 @@ function TemplateModel(attributes, isNewRecord) {
 	];
 
 	this.validate = function(cb) {
+		var errors = [];
+
 		if (this.name)
 			this.v.check(this.name).len(4, 100);
+		else
+			errors.push('The template name is required!');
 
 		if (this.description)
 			this.v.check(this.description).len(0, 255);
 
-		return cb(this.afterValidate(this.v.getErrors()));
+		return cb(this.afterValidate(errors));
 	};
 
 	this.sanitize = function() {
@@ -70,14 +65,16 @@ function TemplateModel(attributes, isNewRecord) {
 		logger.debug('Adding template to database...');
 
 		var _this = this;
+		var now = new Date();
 
 		db.query(
-			'INSERT INTO {{template}}(`name`, `description`, `html`, `plain`) VALUES(:name, :description, :html, :plain)',
+			'INSERT INTO {{template}}(`name`, `description`, `html`, `plain`, `created`) VALUES(:name, :description, :html, :plain, :created)',
 			{
 				name: this.name,
 				description: this.description,
 				html: this.html,
-				plain: this.plain
+				plain: this.plain,
+				created: now
 			},
 			function(err, result) {
 				if (err) {
@@ -85,6 +82,8 @@ function TemplateModel(attributes, isNewRecord) {
 					return cb('Error while creating template!');
 				} else {
 					_this.id = result.insertId;
+					_this.created = now;
+
 					logger.verbose('New template #' + result.insertId + ' created.');
 
 					return cb(null);
@@ -123,6 +122,16 @@ function TemplateModel(attributes, isNewRecord) {
 			}
 		);
 	};
+
+	this.set({
+		id: attributes.id || null,
+		name: attributes.name || '',
+		description: attributes.description || '',
+		html: attributes.html || '',
+		plain: attributes.plain || '',
+		created: attributes.created || null,
+		updated: attributes.updated || '0000-00-00 00:00:00'
+	});
 }
 
 TemplateModel.prototype = new BaseModel();
@@ -133,23 +142,6 @@ var Template = {
 			return new TemplateModel(data);
 		else
 			return new TemplateModel({});
-	},
-
-	findAll: function(cb) {
-		logger.debug('Getting all templates from database...');
-
-		db.query(
-			'SELECT * FROM {{template}} ORDER BY `created` ASC LIMIT 100',
-			function(err, templates) {
-				if (err) {
-					logger.error('Error while loading templates!', err);
-					return cb('Error while loading templates!', null);
-				} else {
-					logger.debug('Got all templates.');
-					return cb(null, templates);
-				}
-			}
-		);
 	},
 
 	find: function(id, cb) {
@@ -193,6 +185,23 @@ var Template = {
 				} else {
 					logger.debug('Found template by name "' + name + '".');
 					return cb(null, new TemplateModel(templates[0], false));
+				}
+			}
+		);
+	},
+
+	findAll: function(cb) {
+		logger.debug('Getting all templates from database...');
+
+		db.query(
+			'SELECT * FROM {{template}} ORDER BY `created` ASC LIMIT 100',
+			function(err, templates) {
+				if (err) {
+					logger.error('Error while loading templates!', err);
+					return cb('Error while loading templates!', null);
+				} else {
+					logger.debug('Got all templates.');
+					return cb(null, templates);
 				}
 			}
 		);

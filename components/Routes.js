@@ -1,6 +1,7 @@
-var Key = require(__dirname + '/Key.js');
-var Template = require(__dirname + '/Template.js');
-var Tag = require(__dirname + '/Tag.js');
+var Key = require(__dirname + '/../models/Key.js');
+var Template = require(__dirname + '/../models/Template.js');
+var Tag = require(__dirname + '/../models/Tag.js');
+
 var Data = require(__dirname + '/Data.js');
 
 var logger = require(__dirname + '/../lib/logger.js');

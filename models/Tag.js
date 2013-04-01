@@ -1,7 +1,8 @@
 var BaseModel = require(__dirname + '/BaseModel.js');
-var Validator = require(__dirname + '/Validator.js').Validator;
-var Filter = require(__dirname + '/Validator.js').Filter;
-var sanitize = require(__dirname + '/Validator.js').sanitize;
+
+var Validator = require(__dirname + '/../components/Validator.js').Validator;
+var Filter = require(__dirname + '/../components/Validator.js').Filter;
+var sanitize = require(__dirname + '/../components/Validator.js').sanitize;
 
 var db = require(__dirname + '/../lib/db.js');
 var logger = require(__dirname + '/../lib/logger.js');
@@ -11,13 +12,6 @@ function TagModel(attributes, isNewRecord) {
 	this._table = '{{tag}}';
 
 	this.init(attributes, isNewRecord);
-
-	this.set({
-		id: attributes.id || null,
-		name: attributes.name || '',
-		description: attributes.description || '',
-		created: attributes.created || null
-	});
 
 	this.attributes = [
 		{
@@ -39,19 +33,21 @@ function TagModel(attributes, isNewRecord) {
 		if (this.description)
 			this.v.check(this.description).len(0, 255);
 
-		return cb(this.afterValidate(this.v.getErrors()));
+		return cb(this.afterValidate());
 	};
 
 	this.create = function(cb) {
 		logger.debug('Adding tag to database...');
 
 		var _this = this;
+		var now = new Date();
 
 		db.query(
-			'INSERT INTO {{tag}}(`name`, `description`) VALUES(:name, :description)',
+			'INSERT INTO {{tag}}(`name`, `description`, `created`) VALUES(:name, :description, :created)',
 			{
 				name: this.name,
-				description: this.description
+				description: this.description,
+				created: now
 			},
 			function(err, result) {
 				if (err) {
@@ -59,6 +55,7 @@ function TagModel(attributes, isNewRecord) {
 					return cb('Error while creating tag!');
 				} else {
 					_this.id = result.insertId;
+					_this.created = now;
 					logger.verbose('New tag #' + result.insertId + ' created.');
 
 					return cb(null);
@@ -96,6 +93,13 @@ function TagModel(attributes, isNewRecord) {
 		this.name = sanitize(this.name).trim();
 		this.description = sanitize(this.description).trim();
 	};
+
+	this.set({
+		id: attributes.id || null,
+		name: attributes.name || '',
+		description: attributes.description || '',
+		created: attributes.created || null
+	});
 }
 
 TagModel.prototype = new BaseModel();

@@ -47,7 +47,6 @@ block content
 						|        "url": "www.example.com"
 						|      }
 						|    },
-						|    "convertToPlain": false,
 						|    "vars": {
 						|       "heading": "Hello"
 						|    }
@@ -56,4 +55,28 @@ block content
 						|    "open": true,
 						|    "links": true
 						|  }
+						|}
+
+				h3 Response
+				pre(class="prettyprint")
+					code(class="language-js")
+						|{
+						|  "status": "ok"
+						|}
+				p or an error while preparing the mail:
+				pre(class="prettyprint")
+					code(class="language-js")
+						|{
+						|  "error": "..."
+						|}
+				p or an error while sending the mail:
+				pre(class="prettyprint")
+					code(class="language-js")
+						|{
+						|  "errors": [
+						|    {
+						|      "recepient": "Tom Test &lt;receiver@gmail.com&gt;"
+						|      "error": "..."  
+						|    }
+						|  ]
 						|}
