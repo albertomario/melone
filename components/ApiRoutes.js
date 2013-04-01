@@ -7,6 +7,7 @@ var logger = require(__dirname + '/../lib/logger.js');
 
 var util = require('util');
 var fs = require('fs');
+var _ = require('underscore');
 
 var ServerError = function(message) {
 	this.code = 500;
@@ -51,7 +52,13 @@ var Routes = {
 
 			theMail.send(function(err) {
 				if (err) {
-					next(new ServerError(err));
+					if (_.isArray(err)) {
+						res.json(500, {
+							errors: err
+						});
+					} else {
+						next(new ServerError(err));
+					}
 				} else {
 					res.json(200, {
 						status: 'ok'

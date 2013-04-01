@@ -13,9 +13,8 @@ module.exports.tag = {
 		query += Sql.create.tag;
 
 		db.query(query, function(err, result) {
-			if (err) {
+			if (err)
 				throw err;
-			}
 
 			cb();
 		});

@@ -13,9 +13,8 @@ module.exports.template = {
 		query += Sql.create.template;
 
 		db.query(query, function(err, result) {
-			if (err) {
+			if (err)
 				throw err;
-			}
 
 			cb();
 		});

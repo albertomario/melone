@@ -13,9 +13,8 @@ module.exports.key = {
 		query += Sql.create.key;
 
 		db.query(query, function(err, result) {
-			if (err) {
+			if (err)
 				throw err;
-			}
 
 			cb();
 		});
