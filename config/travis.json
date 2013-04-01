@@ -13,9 +13,9 @@
 	},
 	"db": {
 		"host": "localhost",
-		"username": "vau_melone",
-		"password": "vmVUbRFGamH2C5Ad",
-		"database": "va_melone",
+		"username": "travis",
+		"password": "",
+		"database": "melone",
 		"prefix": "test_"
 	}
 }
