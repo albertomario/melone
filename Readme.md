@@ -1,4 +1,6 @@
-# Melone Mail API
+# Melone Transaction Mail API
+
+[![Build Status](https://secure.travis-ci.org/<GITHUB_USER>/<REPO_NAME>.png)](http://travis-ci.org/<GITHUB_USER>/<REPO_NAME>)
 
 Start the interface with `node server.js` and the api (send/track emails) with `node api.js`.
 

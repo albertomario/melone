@@ -27,9 +27,7 @@
     "flashify": "~0.1.2",
     "underscore": "~1.4.4",
     "express-validator": "~0.3.2",
-    "validator": "~0.4.28"
-  },
-  "devDependencies": {
+    "validator": "~0.4.28",
     "nodeunit": "~0.8.0",
     "async": "~0.2.6"
   }
