@@ -1,0 +1,21 @@
+{
+	"url": "http://localhost",
+	"app": {
+		"port": 8000,
+		"sessionSecret": "123456789",
+		"salt": "abcdefghijklmnopqrstuvwxyz0123456789"
+	},
+	"api": {
+		"port": 8080,
+		"mailer": {},
+		"mailOptions": {},
+		"type": "SMTP"
+	},
+	"db": {
+		"host": "localhost",
+		"username": "travis",
+		"password": "",
+		"database": "melone",
+		"prefix": "test_"
+	}
+}
