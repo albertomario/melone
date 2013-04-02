@@ -55,22 +55,36 @@ var Sql = {
 				'KEY `mail_to_id` (`mail_to_id`) ' +
 			') ENGINE=InnoDB DEFAULT CHARSET=utf8;',
 		mail_link_click: 'CREATE TEMPORARY TABLE IF NOT EXISTS {{mail_link_click}} (' +
+				'`id` int(10) unsigned NOT NULL AUTO_INCREMENT, ' +
 				'`mail_link_id` int(10) unsigned NOT NULL, ' +
 				'`ip_hash` varchar(64) NOT NULL, ' +
 				'`clicked` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, ' +
+				'PRIMARY KEY (`id`), ' +
 				'KEY `mail_link_id` (`mail_link_id`) ' +
 			') ENGINE=InnoDB DEFAULT CHARSET=utf8;'
 	},
 
+	foreign_keys: [
+		'ALTER TABLE {{mail_link}} ' +
+			'ADD CONSTRAINT {{mail_link_ibfk_1}} FOREIGN KEY (`mail_to_id`) REFERENCES {{mail_to}} (`id`);',
+		'ALTER TABLE {{mail_link_click}} ' +
+			'ADD CONSTRAINT {{mail_link_click_ibfk_1}} FOREIGN KEY (`mail_link_id`) REFERENCES {{mail_link}} (`id`);',
+		'ALTER TABLE {{mail_tag}} ' +
+			'ADD CONSTRAINT {{mail_tag_ibfk_2}} FOREIGN KEY (`tag_id`) REFERENCES {{tag}} (`id`), ' +
+			'ADD CONSTRAINT {{mail_tag_ibfk_1}} FOREIGN KEY (`mail_id`) REFERENCES {{mail}} (`id`);',
+		'ALTER TABLE {{mail_to}} ' +
+			'ADD CONSTRAINT {{mail_to_ibfk_1}} FOREIGN KEY (`mail_id`) REFERENCES {{mail}} (`id`);'
+	],
+
 	remove: {
-		key: 'DROP TEMPORARY TABLE IF EXISTS {{key}};',
-		tag: 'DROP TEMPORARY TABLE IF EXISTS {{tag}};',
-		template: 'DROP TEMPORARY TABLE IF EXISTS {{template}};',
-		mail: 'DROP TEMPORARY TABLE IF EXISTS {{mail}};',
+		mail_link_click: 'DROP TEMPORARY TABLE IF EXISTS {{mail_link_click}};',
+		mail_link: 'DROP TEMPORARY TABLE IF EXISTS {{mail_link}};',
 		mail_tag: 'DROP TEMPORARY TABLE IF EXISTS {{mail_tag}};',
 		mail_to: 'DROP TEMPORARY TABLE IF EXISTS {{mail_to}};',
-		mail_link: 'DROP TEMPORARY TABLE IF EXISTS {{mail_link}};',
-		mail_link_click: 'DROP TEMPORARY TABLE IF EXISTS {{mail_link_click}};'
+		mail: 'DROP TEMPORARY TABLE IF EXISTS {{mail}};',
+		key: 'DROP TEMPORARY TABLE IF EXISTS {{key}};',
+		tag: 'DROP TEMPORARY TABLE IF EXISTS {{tag}};',
+		template: 'DROP TEMPORARY TABLE IF EXISTS {{template}};'
 	}
 };
 

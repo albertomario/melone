@@ -2,14 +2,26 @@
 
 [![Build Status](https://secure.travis-ci.org/t-visualappeal/melone.png)](http://travis-ci.org/t-visualappeal/melone) [![Dependency Status](https://gemnasium.com/t-visualappeal/melone.png)](https://gemnasium.com/t-visualappeal/melone)
 
-Start the interface with `node server.js` and the api (send/track emails) with `node api.js`.
-
 ## Config
 
 Change config with `export MELONE_CONFIG=my_config.json`. A default config is provided in `config/default.json`.
 
-## Sending emails
+## Install
 
+Install dependencies and database scheme with `(sudo) make install` and delete the scheme with `make uninstall`.
+
+## Usage
+
+Start the interface with `node server.js` and the api (send/track emails) with `node api.js`.
+
+### Sending emails
+
+** URL **
+```bash
+[POST] http://localhost:8080/api/mail/send
+```
+
+** Body **
 ```javascript
 {
  "key": "f8a6657dc19b61cbd142c57ebb381128",
@@ -48,7 +60,7 @@ Change config with `export MELONE_CONFIG=my_config.json`. A default config is pr
 }
 ```
 
-### Response
+#### Response
 
 ```javascript
 {
