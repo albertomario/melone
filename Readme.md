@@ -10,6 +10,12 @@ Change config with `export MELONE_CONFIG=my_config.json`. A default config is pr
 
 ## Sending emails
 
+** URL **
+```bash
+[POST] http://localhost:8080/api/mail/send
+```
+
+** Body **
 ```javascript
 {
  "key": "f8a6657dc19b61cbd142c57ebb381128",
