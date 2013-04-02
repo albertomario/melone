@@ -67,3 +67,11 @@ Start the interface with `node server.js` and the api (send/track emails) with `
   "status": "ok"
 }
 ```
+
+## Screenshots
+
+![Statistics on the frontpage](http://www.visualappeal.de/github/melone/melone_index.png "Statistics on the frontpage")
+
+![View template](http://www.visualappeal.de/github/melone/melone_template_view.png "View template")
+
+![Tag reports](http://www.visualappeal.de/github/melone/melone_report_tag.png "Tag reports")
