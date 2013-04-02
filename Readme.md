@@ -16,12 +16,12 @@ Start the interface with `node server.js` and the api (send/track emails) with `
 
 ### Sending emails
 
-** URL **
+**URL**
 ```bash
 [POST] http://localhost:8080/api/mail/send
 ```
 
-** Body **
+**Body**
 ```javascript
 {
  "key": "f8a6657dc19b61cbd142c57ebb381128",
