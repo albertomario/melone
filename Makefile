@@ -5,8 +5,10 @@ test:
 
 build:
 	lessc --yui-compress ./assets/less/main.less > ./assets/css/main.min.css
+	uglifyjs ./assets/js/main.js -o ./assets/js/main.min.js
 	sass ./assets/less/font.scss ./assets/css/font.min.css
 
 install:
-	sudo npm install -g lessc
-	sudo gem install sass
+	npm install -g lessc
+	npm install -g uglify-js
+	gem install sass
