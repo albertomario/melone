@@ -76,6 +76,38 @@ module.exports.server = {
 		});
 	},
 
+	testTemplateView: function(test) {
+		test.expect(2);
+
+		var theTemplate = Template.factory({
+			name: 'Template test',
+			description: '',
+			html: '<h1>Test</h1>',
+			plain: 'Test'
+		});
+
+		theTemplate.save(function(err) {
+			test.ifError(err);
+
+			httpTest.get('/templates/' + theTemplate.id, function(err, res) {
+				test.ifError(err);
+
+				test.done();
+			});
+		});
+	},
+
+	testTemplateViewNotFound: function(test) {
+		test.expect(2);
+
+		httpTest.get('/templates/1', function(err, res) {
+			test.ifError(err);
+			test.strictEqual(res.request.path, '/templates');
+
+			test.done();
+		});
+	},
+
 	testTemplateAdd: function(test) {
 		test.expect(1);
 
@@ -114,7 +146,7 @@ module.exports.server = {
 		theTemplate.save(function(err) {
 			test.ifError(err);
 
-			httpTest.get('/templates/edit/' + 2, function(err, res) {
+			httpTest.get('/templates/edit/' + theTemplate.id, function(err, res) {
 				test.ifError(err);
 
 				test.done();
@@ -122,8 +154,44 @@ module.exports.server = {
 		});
 	},
 
+	testTemplateEditNotFound: function(test) {
+		test.expect(1);
+
+		httpTest.get('/templates/edit/1', function(err, res) {
+			test.notStrictEqual(err, null);
+
+			test.done();
+		});
+	},
+
 	testTemplateUpdate: function(test) {
-		test.done();
+		test.expect(5);
+
+		var theTemplate = Template.factory({
+			name: 'Template test',
+			description: '',
+			html: '<h1>Test</h1>',
+			plain: 'Test'
+		});
+
+		theTemplate.save(function(err) {
+			test.ifError(err);
+
+			httpTest.post('/templates/edit/' + theTemplate.id, {
+				name: 'Template update'
+			}, function(err, res) {
+				test.ifError(err);
+
+				Template.find(theTemplate.id, function(err, updatedTemplate) {
+					test.ifError(err);
+
+					test.strictEqual(updatedTemplate.id, theTemplate.id);
+					test.strictEqual(updatedTemplate.name, 'Template update');
+
+					test.done();
+				});
+			});
+		});
 	},
 
 	tearDown: function(cb) {
