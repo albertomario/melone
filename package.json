@@ -28,7 +28,11 @@
     "underscore": "~1.4.4",
     "express-validator": "~0.3.2",
     "validator": "~0.4.28",
-    "nodeunit": "~0.8.0",
     "async": "~0.2.6"
+  },
+  "devDependencies": {
+    "nodeunit": "~0.8.0",
+    "request": "~2.16.6",
+    "istanbul": "~0.1.34"
   }
 }

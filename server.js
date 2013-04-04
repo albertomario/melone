@@ -19,9 +19,9 @@ app.configure(function() {
 		}
 	}));
 	app.use(flashify);
-	app.use(Routes.error);
 	app.use(expressValidator);
 	app.use(app.router);
+	app.use(Routes.error);
 });
 
 app.get('/', Routes.index);
@@ -58,10 +58,14 @@ app.get('/data/index', Routes.data.index);
 app.get('/data/links', Routes.data.links);
 app.get('/data/tags', Routes.data.tags);
 
-app.listen(config.app.port, function(err) {
-	if (err) {
-		throw err;
-	} else {
-		logger.notice('Listening on port ' + config.app.port);
-	}
-});
+if (!module.parent) {
+	app.listen(config.app.port, function(err) {
+		if (err) {
+			throw err;
+		} else {
+			logger.notice('Listening on port ' + config.app.port);
+		}
+	});
+} else {
+	module.exports = app;
+}

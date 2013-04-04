@@ -1,4 +1,5 @@
 config/*
+coverage/*
 node_modules/*
 *.sublime-*
 *.scssc

@@ -24,10 +24,8 @@ module.exports.mail = {
 
 		async.eachSeries(querys, function(query, next) {
 			db.query(query, function(err, result) {
-				if (err) {
-					console.log(err);
+				if (err)
 					throw err;
-				}
 
 				next(null);
 			});
@@ -429,10 +427,8 @@ module.exports.mail = {
 
 		async.eachSeries(querys, function(query, next) {
 			db.query(query, function(err, result) {
-				if (err) {
-					console.log(err);
+				if (err)
 					throw err;
-				}
 
 				next(null);
 			});
