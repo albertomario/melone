@@ -28,6 +28,12 @@ var Routes = {
 	error: function(err, req, res, next) {
 		res.render('error.jade', {
 			error: err.message
+		}, function(renderError, html) {
+			if (renderError) {
+				res.send(500, 'Error while displaying the error template!');
+			} else {
+				res.send(err.code, html);
+			}
 		});
 	},
 

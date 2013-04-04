@@ -1,7 +1,8 @@
 .PHONY: test build install
 
 test:
-	node testrunner.js
+	./node_modules/istanbul/lib/cli.js cover ./testrunner.js
+	./node_modules/istanbul/lib/cli.js report html
 
 build:
 	lessc --yui-compress ./assets/less/main.less > ./assets/css/main.min.css
