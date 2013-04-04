@@ -16,8 +16,8 @@ app.configure(function() {
 			maxAge: 60000
 		}
 	}));
-	app.use(Routes.error);
 	app.use(app.router);
+	app.use(Routes.error);
 });
 
 function authenticate(req, res, next) {
@@ -45,10 +45,14 @@ app.post('/api/mail/send', authenticate, Routes.mail.send);
 app.get('/api/o/:id.gif', Routes.tracking.open);
 app.get('/api/l/:id', Routes.tracking.click);
 
-app.listen(config.api.port, function(err) {
-	if (err) {
-		throw err;
-	} else {
-		logger.notice('Listening on port ' + config.api.port);
-	}
-});
+if (!module.parent) {
+	app.listen(config.api.port, function(err) {
+		if (err) {
+			throw err;
+		} else {
+			logger.notice('Listening on port ' + config.api.port);
+		}
+	});
+} else {
+	module.exports = app;
+}
