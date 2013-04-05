@@ -30,6 +30,13 @@ function BaseModel() {
 		var html = '';
 
 		for (var i = 0; i < this.attributes.length; i++) {
+			if (_.isUndefined(this[this.attributes[i].name])) {
+				this[this.attributes[i].name] = '';
+			} else {
+				//Code coverage
+				this[this.attributes[i].name] = this[this.attributes[i].name];
+			}
+
 			html += '<div class="row">';
 			html += '<div class="large-12 columns">';
 			html += '<label for="' + this.attributes[i].name + '">' + this.attributes[i].title + '</label>';
@@ -67,7 +74,7 @@ function BaseModel() {
 			_this.errors.push(err);
 		});
 
-		return (this.errors.length === 0) ? null : this.getFirstError();
+		return (this.errors && this.errors.length > 0) ? this.getFirstError() : null;
 	};
 
 	this.save = function(cb) {
