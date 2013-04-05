@@ -5,6 +5,7 @@ var httpTest = require(__dirname + '/../lib/httpTest.js');
 var Sql = require(__dirname + '/../components/Sql.js');
 
 var Template = require(__dirname + '/../models/Template.js');
+var Tag = require(__dirname + '/../models/Tag.js');
 
 var async = require('async');
 
@@ -190,6 +191,71 @@ module.exports.server = {
 
 					test.done();
 				});
+			});
+		});
+	},
+
+	testTemplateRemove: function(test) {
+		test.expect(4);
+
+		var theTemplate = Template.factory({
+			name: 'Template test',
+			description: '',
+			html: '<h1>Test</h1>',
+			plain: 'Test'
+		});
+
+		theTemplate.save(function(err) {
+			test.ifError(err);
+
+			httpTest.get('/templates/remove/' + theTemplate.id, function(err, res) {
+				test.ifError(err);
+
+				Template.findAll(function(err, templates) {
+					test.ifError(err);
+
+					test.strictEqual(templates.length, 0);
+
+					test.done();
+				});
+			});
+		});
+	},
+
+	testTemplateRemoveNotFound: function(test) {
+		test.expect(1);
+
+		httpTest.get('/templates/remove/1', function(err, res) {
+			test.notStrictEqual(err, null);
+
+			test.done();
+		});
+	},
+
+	testTagIndex: function(test) {
+		test.expect(1);
+
+		httpTest.get('/tags', function(err, res) {
+			test.ifError(err);
+
+			test.done();
+		});
+	},
+
+	testTagView: function(test) {
+		test.expect(2);
+
+		var theTag = Tag.factory({
+			name: 'Test Tag'
+		});
+
+		theTag.save(function(err) {
+			test.ifError(err);
+
+			httpTest.get('/tags/' + theTag.id, function(err, res) {
+				test.ifError(err);
+
+				test.done();
 			});
 		});
 	},
