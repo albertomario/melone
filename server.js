@@ -51,7 +51,6 @@ app.get('/docs/templates', Routes.docs.templates);
 app.get('/docs/tags', Routes.docs.tags);
 
 app.get('/reports/links', Routes.reports.links);
-app.get('/reports/opens', Routes.reports.opens);
 app.get('/reports/tags', Routes.reports.tags);
 
 app.get('/data/index', Routes.data.index);

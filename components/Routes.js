@@ -321,10 +321,6 @@ var Routes = {
 			res.render('reports/links.jade');
 		},
 
-		opens: function(req, res, next) {
-			res.render('reports/opens.jade');
-		},
-
 		tags: function(req, res, next) {
 			res.render('reports/tags.jade');
 		}
