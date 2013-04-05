@@ -1,0 +1,3 @@
+[submodule "assets/foundation"]
+	path = assets/foundation
+	url = https://github.com/websymphony/almost-flat-ui.git
