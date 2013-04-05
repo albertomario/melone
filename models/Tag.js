@@ -11,6 +11,9 @@ function TagModel(attributes, isNewRecord) {
 	this._name = 'tag';
 	this._table = '{{tag}}';
 
+	this.name = '';
+	this.description = '';
+
 	this.init(attributes, isNewRecord);
 
 	this.attributes = [
@@ -27,11 +30,8 @@ function TagModel(attributes, isNewRecord) {
 	];
 
 	this.validate = function(cb) {
-		if (this.name)
-			this.v.check(this.name).len(4, 50);
-
-		if (this.description)
-			this.v.check(this.description).len(0, 255);
+		this.v.check(this.name, 'Tag name must be between 4 and 50 characters!').len(4, 50);
+		this.v.check(this.description, 'Tag description cannot be longer than 255 characters!').len(0, 255);
 
 		return cb(this.afterValidate());
 	};

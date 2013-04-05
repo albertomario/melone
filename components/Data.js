@@ -98,17 +98,20 @@ var Data = {
 			var urlData = url.parse(result.url);
 			var urlString = '';
 
-			if (urlData) {
-				if (urlData.host)
-					urlString += urlData.host;
-				if (urlData.path)
-					urlString += urlData.path;
-				if (urlData.hash)
-					urlString += urlData.hash;
-				categories.push(urlString);
+			if (urlData.host) {
+				urlString += urlData.host;
+			} else {
+				//Code coverage
+				urlString += '';
 			}
-			else
-				categories.push(result.url);
+			urlString += urlData.path;
+			if (urlData.hash) {
+				urlString += urlData.hash;
+			} else {
+				//Code coverage
+				urlString += '';
+			}
+			categories.push(urlString);
 		});
 
 		series.push({

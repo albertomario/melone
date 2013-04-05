@@ -13,6 +13,11 @@ function TemplateModel(attributes, isNewRecord) {
 	this._name = 'template';
 	this._table = '{{template}}';
 
+	this.name = '';
+	this.description = '';
+	this.html = '';
+	this.plain = '';
+
 	this.init(attributes, isNewRecord);
 
 	this.attributes = [
@@ -41,13 +46,8 @@ function TemplateModel(attributes, isNewRecord) {
 	this.validate = function(cb) {
 		var errors = [];
 
-		if (this.name)
-			this.v.check(this.name).len(4, 100);
-		else
-			errors.push('The template name is required!');
-
-		if (this.description)
-			this.v.check(this.description).len(0, 255);
+		this.v.check(this.name, 'Template name has to be between 4 and 100 characters!').len(4, 100);
+		this.v.check(this.description, 'Template description cannot be longer than 255 characters').len(0, 255);
 
 		return cb(this.afterValidate(errors));
 	};

@@ -26,13 +26,13 @@ NotFoundError.name = 'NotFoundError';
 
 var Routes = {
 	error: function(err, req, res, next) {
-		res.render('error.jade', {
+		res.status(err.code || 500).render('error.jade', {
 			error: err.message
 		}, function(renderError, html) {
 			if (renderError) {
 				res.send(500, 'Error while displaying the error template!');
 			} else {
-				res.send(err.code, html);
+				res.send(err.code || 500, html);
 			}
 		});
 	},
@@ -319,10 +319,6 @@ var Routes = {
 	reports: {
 		links: function(req, res, next) {
 			res.render('reports/links.jade');
-		},
-
-		opens: function(req, res, next) {
-			res.render('reports/opens.jade');
 		},
 
 		tags: function(req, res, next) {

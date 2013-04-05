@@ -1,6 +1,6 @@
 {
   "name": "Melone",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "Mail REST API",
   "main": "server.js",
   "scripts": {
