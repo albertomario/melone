@@ -136,11 +136,18 @@ var Data = {
 		var firstDate = this._getFirstDate();
 
 		db.query(
-			'SELECT COUNT(*) AS `count`, DATE(`sent`) AS `date` ' +
-				'FROM {{mail}} ' +
-				'WHERE DATE(`sent`) >= :first_date ' +
-				'GROUP BY YEAR(`sent`), MONTH(`sent`), DAY(`sent`) ' +
-				'ORDER BY `sent` ASC',
+			'SELECT ' +
+					'COUNT(*) AS `count`, ' +
+					'DATE({{mail}}.`sent`) AS `date` ' +
+				'FROM ' +
+					'{{mail_to}}, ' +
+					'{{mail}} ' +
+				'WHERE ' +
+					'{{mail}}.`sent` >= :first_date ' +
+					'AND {{mail_to}}.`mail_id` = {{mail}}.`id` ' +
+				'GROUP BY ' +
+					'YEAR({{mail}}.`sent`), MONTH({{mail}}.`sent`), DAY({{mail}}.`sent`) ' +
+				'ORDER BY {{mail}}.`sent` ASC',
 			{
 				first_date: firstDate
 			},
@@ -254,6 +261,7 @@ var Data = {
 			'SELECT {{mail_link}}.`url` AS `url`, COUNT({{mail_link_click}}.`mail_link_id`) AS `count` ' +
 				'FROM  {{mail_link}}, {{mail_link_click}} ' +
 				'WHERE {{mail_link}}.`id` = {{mail_link_click}}.`mail_link_id` ' +
+				'AND {{mail_link_click}}.`clicked` BETWEEN CURDATE() - INTERVAL 30 DAY AND CURDATE()' +
 				'GROUP BY {{mail_link}}.`url` ' +
 				'LIMIT 20',
 			function(err, results) {

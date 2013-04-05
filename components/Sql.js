@@ -85,6 +85,17 @@ var Sql = {
 		key: 'DROP TEMPORARY TABLE IF EXISTS {{key}};',
 		tag: 'DROP TEMPORARY TABLE IF EXISTS {{tag}};',
 		template: 'DROP TEMPORARY TABLE IF EXISTS {{template}};'
+	},
+
+	truncate: {
+		mail_link_click: 'TRUNCATE TABLE {{mail_link_click}};',
+		mail_link: 'TRUNCATE TABLE {{mail_link}};',
+		mail_tag: 'TRUNCATE TABLE {{mail_tag}};',
+		mail_to: 'TRUNCATE TABLE {{mail_to}};',
+		mail: 'TRUNCATE TABLE {{mail}};',
+		key: 'TRUNCATE TABLE {{key}};',
+		tag: 'TRUNCATE TABLE {{tag}};',
+		template: 'TRUNCATE TABLE {{template}};'
 	}
 };
 
