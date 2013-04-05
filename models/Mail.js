@@ -243,7 +243,7 @@ var Mail = function(params) {
 					logger.error('Could not get the tags from database!', err);
 					return cb('Could not get the tags from database!');
 				} else {
-					if (tags.length) {
+					if (tags.length > 0) {
 						sql = 'INSERT INTO {{mail_tag}}(`mail_id`, `tag_id`) VALUES ';
 						params = {
 							mail_id: _this.id

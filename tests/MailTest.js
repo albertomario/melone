@@ -189,32 +189,30 @@ module.exports.mail = {
 	},
 
 	testAddTrackingLinks: function(test) {
-		test.expect(4);
+		test.expect(3);
 
 		var theMail = new Mail();
 		var recipient = {
 			id: 1
 		};
-		var html = 'Convert http://www.example.com';
-		var plain = 'Convert http://www.example.com';
 
-		var plainTracked = 'Convert ' + theMail._getApiUrl('api/l/1');
-		var htmlTracked = 'Convert ' + theMail._getApiUrl('api/l/2');
+		var plainTracked = 'Convert plain ' + theMail._getApiUrl('api/l/1');
+		var htmlTracked = 'Convert html ' + theMail._getApiUrl('api/l/2');
 
-		theMail.plain = plain;
-		theMail.html = html;
+		theMail.plain = 'Convert plain http://www.example.com';
+		theMail.html = 'Convert html http://www.example.com';
 
-		theMail._addTrackingLinksPlain(theMail.plain, recipient, function(err, thePlain, plainRecipient) {
+		theMail.tracking = {
+			links: true
+		};
+
+		theMail._addTrackingLinks(theMail.plain, theMail.html, recipient, function(err, thePlain, theHtml, theRecipient) {
 			test.ifError(err);
 
-			theMail._addTrackingLinksHtml(theMail.html, plainRecipient, function(err, theHtml, htmlRecipient) {
-				test.ifError(err);
+			test.strictEqual(theHtml, htmlTracked, 'HTML tracking gone wrong!');
+			test.strictEqual(theHtml, htmlTracked, 'Plain text tracking gone wrong!');
 
-				test.strictEqual(theHtml, htmlTracked, 'HTML tracking gone wrong!');
-				test.strictEqual(theHtml, htmlTracked, 'Plain text tracking gone wrong!');
-
-				test.done();
-			});
+			test.done();
 		});
 	},
 
@@ -296,6 +294,49 @@ module.exports.mail = {
 					});
 				});
 			});
+		});
+	},
+
+	testInsertTagsNoId: function(test) {
+		test.expect(2);
+
+		var tag1 = new Tag.factory({
+			name: 'tag1'
+		});
+		var theMail = new Mail({
+			tags: [
+				'tag1'
+			]
+		});
+
+		tag1.save(function(err) {
+			test.ifError(err);
+
+			theMail._insertTags(function(err) {
+				test.notStrictEqual(err, null);
+
+				test.done();
+			});
+		});
+	},
+
+	testInsertTagsNoTags: function(test) {
+		test.expect(1);
+
+		var tag1 = new Tag.factory({
+			name: 'tag1'
+		});
+		var theMail = new Mail({
+			tags: [
+				'tag1'
+			]
+		});
+		theMail.id = 1;
+
+		theMail._insertTags(function(err) {
+			test.ifError(err);
+
+			test.done();
 		});
 	},
 
