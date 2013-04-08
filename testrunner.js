@@ -20,16 +20,24 @@ var reporter = require('nodeunit').reporters.default;
 httpTest.startServer(function(err) {
 	if (err) throw err;
 
-	reporter.run(['tests/'], null, function(err) {
-		db.end();
+	httpTest.startApiServer(function(err) {
+		if (err) throw err;
 
-		httpTest.closeServer(function(err) {
-			if (err) throw err;
+		reporter.run(['tests/'], null, function(err) {
+			db.end();
 
-			process.env.MELONE_TEST = varTest;
-			process.env.MELONE_CONFIG = varConfig;
+			httpTest.closeServer(function(err) {
+				if (err) throw err;
 
-			process.exit(0);
+				httpTest.closeApiServer(function(err) {
+					if (err) throw err;
+
+					process.env.MELONE_TEST = varTest;
+					process.env.MELONE_CONFIG = varConfig;
+
+					process.exit(0);
+				});
+			});
 		});
 	});
 });

@@ -433,15 +433,15 @@ var Mail = function(params) {
 
 					_this._compileHtml(contentHtml, staticHtmlVars, userVars, function(err, html) {
 						if (err) {
-							return cb(err);
+							return cb(err, null);
 						} else {
 							_this._compilePlain(contentPlain, staticPlainVars, userVars, function(err, plain) {
 								if (err) {
-									return cb(err);
+									return cb(err, null);
 								} else {
 									_this._addTrackingLinks(plain, html, recipient, function(err, thePlain, theHtml, theRecipient) {
 										if (err) {
-											return cb(err);
+											return cb(err, null);
 										} else {
 											if (_this.tracking) {
 												if (_this.tracking.open) {
@@ -455,7 +455,7 @@ var Mail = function(params) {
 												if (!errors.length)
 													errors = null;
 
-												return cb(errors);
+												return cb(errors, _this.id);
 											} else {
 												mailTransport.sendMail(_.extend(mailOptions, {
 														to: _this._convertRecipient(theRecipient),
@@ -480,7 +480,7 @@ var Mail = function(params) {
 															if (!errors.length)
 																errors = null;
 
-															return cb(errors);
+															return cb(errors, _this.id);
 														}
 													}
 												);
