@@ -71,7 +71,6 @@ var Routes = {
 
 	tracking: {
 		open: function(req, res, next) {
-			//console.log('track open', req.params);
 			Tracking.open(req.params.id, function(err) {
 				fs.readFile(__dirname + '/../assets/images/track_open.gif', function(err, img) {
 					if (err) {

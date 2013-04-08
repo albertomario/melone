@@ -179,14 +179,11 @@ module.exports.server = {
 		theMail.send(function(err, id) {
 			test.ifError(err);
 
-			httpTest.get('/api/l/o/1.gif', function(err, res) {
+			httpTest.getApi('/api/o/1.gif', function(err, res) {
 				test.ifError(err);
 
 				db.query({
-						sql: 'SELECT `opened` FROM {{mail_to}} WHERE `mail_id` = ' + id,
-						typeCast: function (field, orig) {
-							return field.type === 'TIMESTAMP' ? field.string() : orig();
-						}
+						sql: 'SELECT `opened` FROM {{mail_to}} WHERE `mail_id` = ' + id
 					},
 					function(err, result) {
 						test.ifError(err);
