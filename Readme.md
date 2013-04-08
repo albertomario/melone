@@ -74,4 +74,4 @@ Start the interface with `node server.js` and the api (send/track emails) with `
 
 ![View template](http://www.visualappeal.de/github/melone/melone_template_view.png "View template")
 
-![Tag reports](http://www.visualappeal.de/github/melone/melone_report_tag.png "Tag reports")
+![Link report](http://www.visualappeal.de/github/melone/melone_report_link.png "Link Report")
