@@ -39,7 +39,8 @@ function authenticate(req, res, next) {
 	}
 }
 
-app.post('/api/status', authenticate, Routes.status);
+app.get('/api/status', Routes.status);
+app.post('/api/authenticate', authenticate, Routes.status);
 app.post('/api/mail/send', authenticate, Routes.mail.send);
 
 app.get('/api/o/:id.gif', Routes.tracking.open);

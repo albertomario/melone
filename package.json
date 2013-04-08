@@ -1,6 +1,6 @@
 {
   "name": "Melone",
-  "version": "0.9.4",
+  "version": "0.9.5",
   "description": "Mail REST API",
   "main": "server.js",
   "scripts": {
@@ -27,7 +27,7 @@
     "flashify": "~0.1.2",
     "underscore": "~1.4.4",
     "express-validator": "~0.3.2",
-    "validator": "~0.4.28",
+    "validator": "~0.5.0",
     "async": "~0.2.6"
   },
   "devDependencies": {

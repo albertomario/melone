@@ -35,7 +35,7 @@ BadRequestError.name = 'BadRequestError';
 
 var Routes = {
 	error: function(err, req, res, next) {
-		res.json(err.code, {
+		res.json(err.code || 500, {
 			error: err.message
 		});
 	},
@@ -50,7 +50,7 @@ var Routes = {
 		send: function(req, res, next) {
 			var theMail = new Mail(req.body);
 
-			theMail.send(function(err) {
+			theMail.send(function(err, id) {
 				if (err) {
 					if (_.isArray(err)) {
 						res.json(500, {
@@ -61,7 +61,8 @@ var Routes = {
 					}
 				} else {
 					res.json(200, {
-						status: 'ok'
+						status: 'ok',
+						id: id
 					});
 				}
 			});
