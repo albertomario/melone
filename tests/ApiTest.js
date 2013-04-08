@@ -174,22 +174,90 @@ module.exports.server = {
 			}
 		});
 
-		var now = new Date();
-
 		theMail.send(function(err, id) {
 			test.ifError(err);
 
 			httpTest.getApi('/api/o/1.gif', function(err, res) {
 				test.ifError(err);
 
-				db.query({
-						sql: 'SELECT `opened` FROM {{mail_to}} WHERE `mail_id` = ' + id
+				db.query(
+					'SELECT `opened` FROM {{mail_to}} WHERE `mail_id` = :id',
+					{
+						id: id
 					},
 					function(err, result) {
 						test.ifError(err);
 
 						test.done();
 				});
+			});
+		});
+	},
+
+	testTrackingClick: function(test) {
+		test.expect(8);
+
+		var theMail = new Mail({
+			to: [
+				{
+					email: 'test@example.org'
+				}
+			],
+			subject: 'Welcome',
+			content: {
+				html: {
+					text: '<h1>Welcome</h1> <a href="http://www.example.com">example.com</a>'
+				},
+				plain: {
+					text: 'Welcome http://www.example.com'
+				}
+			},
+			tracking: {
+				links: true
+			}
+		});
+		var mailToId = null;
+		var plain = 0;
+		var html = 0;
+
+		theMail.send(function(err, id) {
+			test.ifError(err);
+
+			httpTest.getApi('/api/l/1', function(err, res) {
+				test.ifError(err);
+
+				db.query(
+					'SELECT `mail_id` FROM {{mail_to}} LIMIT 1;',
+					function(err, results) {
+						test.ifError(err);
+
+						test.strictEqual(results.length, 1);
+
+						mailToId = results[0]['mail_id'];
+
+						db.query(
+							'SELECT `plain` FROM {{mail_link}} WHERE `mail_to_id` = :mail_to_id',
+							{
+								mail_to_id: mailToId
+							},
+							function(err, results) {
+								test.ifError(err);
+
+								test.strictEqual(results.length, 3);
+								for (var i = 0; i < results.length; i++) {
+									if (results[i]['plain'] === 0)
+										html++;
+									else
+										plain++;
+								}
+
+								test.strictEqual(plain, 1);
+								test.strictEqual(html, 2);
+
+								test.done();
+						});
+					}
+				);
 			});
 		});
 	},
